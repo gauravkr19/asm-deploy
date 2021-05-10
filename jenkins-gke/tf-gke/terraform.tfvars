@@ -1,7 +1,7 @@
 
 
-project_id = "bcm-pcidss-devops-dev"
-tfstate_gcs_backend = "bcm-pcidss-devops-dev-tfstate"
+project_id = "playground-s-11-f9cee833"
+tfstate_gcs_backend = "playground-s-11-f9cee833-tfstate"
 region = "us-central1"
 zones = ["us-central1-a"]
 ip_range_pods_name = "ip-range-pods"
