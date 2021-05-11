@@ -4,8 +4,8 @@ This pipeline is picked from GCP article -  [Managing Infrastructure as Code wit
 =====
 
 Jenkins Setup:
---> Now, Jenkinsfile has the logic to provision infra in the target env and
 --> Jenkins is configured uisng JCasC plugin passed to Helm via the values.yaml
+--> Jenkinsfile has the pipeline logic to provision infra in the target env.
 
 Issue: The Jenkins deployment makes use of deprecated Helm repo.
 Approach to resolve: We may have to update the Helm repo. However, we are facing issue in passing the env var to container pods which worked fine with deprecated Helm repo. We are looking into it to fix it.
