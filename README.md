@@ -17,7 +17,7 @@ Issue-2: Google Terraform Module 'modules/project_services', used in the repo, i
 
 Approach to resolve: Haven't looked into, but can use the resource to enable the listed Services if the Module is not working.
 
-Issue-2: Update the Terraform version (for Host machine and Jenkins Pods); Using 0.12.24 now
+Issue-3: Update the Terraform version (for Host machine and Jenkins Pods); Using 0.12.24 now
 
 Approach to resolve: Latest version is 15.1; so will have to update to a stable Terraform version. This may also require some code update.
 
