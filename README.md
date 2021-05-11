@@ -2,7 +2,7 @@ This is the repository for [Managing Infrastructure as Code with Terraform and J
 
 Jenkins Setup:
 
---> Jenkins is configured uisng JCasC plugin passed to Helm via the values.yaml
+--> Jenkins is configured using JCasC plugin passed to Helm via the values.yaml
 
 --> Jenkinsfile has the pipeline logic to provision infra in the target env.
 
@@ -11,9 +11,9 @@ Listing out some of the issues with the existing code.
 Issue-1: The Jenkins deployment makes use of deprecated Helm repo.
 
 Approach to resolve: We may have to update the Helm repo. However, we are facing issue in passing the env var to container pods which worked fine with deprecated Helm repo. We are looking into it to fix it.
-Also briefed Pavithra on this, and requested to her with Jenkins pipeline setup. She is looking into it. 
+Also briefed Pavithra on this, and requested her in setting up Jenkins using the groovy pipeline code. She is looking into it. 
 
-Issue-2: Google TF Module 'modules/project_services' is NOT able to enable the Services.
+Issue-2: Google Terraform Module 'modules/project_services', used in the repo, is NOT able to enable the Services.
 
 Approach to resolve: Haven't looked into, but can use the resource to enable the listed Services if the Module is not working.
 
