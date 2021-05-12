@@ -176,7 +176,7 @@ resource "google_storage_bucket_iam_member" "tf-state-writer" {
 /*****************************************
   Grant Jenkins SA Permissions project editor
  *****************************************/
-resource "google_project_iam_member" "jenkins-project" {
+/* resource "google_project_iam_member" "jenkins-project" {
   project = module.enables-google-apis.project_id
   role    = "roles/editor"
   member = module.workload_identity.gcp_service_account_fqn
@@ -195,5 +195,5 @@ resource "helm_release" "jenkins" {
   depends_on = [
     kubernetes_secret.gh-secrets,
   ]
-}
+} */
 
