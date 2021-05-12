@@ -94,8 +94,7 @@ controller:
       valueFrom:
         secretKeyRef:
             name: jenkins-k8s-config
-            key: jenkins_tf_ksa  
-
+            key: jenkins_tf_ksa    
   #   - name: http_proxy
   #     value: "http://192.168.64.1:3128"
   # Set min/max heap here if needed with:
@@ -228,10 +227,10 @@ controller:
 
   # List of plugins to be install during Jenkins controller start
   installPlugins:
-    - kubernetes:1.29.2
-    - workflow-aggregator:2.6
-    - git:4.7.1
-    - configuration-as-code:1.47
+    - kubernetes:latest
+    - workflow-aggregator:latest
+    - git:latest
+    - configuration-as-code:latest
     - workflow-job:latest
     - credentials-binding:latest
     - blueocean:latest
@@ -240,7 +239,7 @@ controller:
     - docker-commons:latest
     - docker-workflow:latest
     - job-dsl:latest
-    - jdk-tool:latest      
+    - jdk-tool:latest
 
   # Set to false to download the minimum required version of all dependencies.
   installLatestPlugins: false
@@ -302,9 +301,9 @@ controller:
                               label: "jnlp-exec"
                               containers:
                                 - name: "jnlp"
-                                  image: "jenkins/jnlp-slave"
+                                  image: "jenkins/jnlp-slave"                                  
                                   alwaysPullImage: false
-                                  workingDir: "/home/jenkins/agent"
+                                  workingDir: "/home/jenkins"
                                   ttyEnabled: true
                                   command: ""
                                   args: ""
@@ -328,12 +327,12 @@ controller:
                                 - name: "terraform"
                                   image: "hashicorp/terraform:0.12.29"
                                   alwaysPullImage: false
-                                  workingDir: "/home/jenkins/agent"
+                                  workingDir: "/home/jenkins"
                                   ttyEnabled: true
                                   command: "/bin/sh -c"
                                   args: "cat"
-                                  resourceRequestCpu: "200m"
-                                  resourceLimitCpu: "700m"
+                                  resourceRequestCpu: "100m"
+                                  resourceLimitCpu: "500m"
                                   resourceRequestMemory: "500Mi"
                                   resourceLimitMemory: "1Gi"
                               volumes:
@@ -369,7 +368,7 @@ controller:
                             scanCredentialsId('github-token')
                             repoOwner("${GITHUB_USERNAME}")
                             repository("${GITHUB_REPO}")
-                            apiUri('https://github.dxc.com/api/v3')
+                            apiUri('https://github.dxc.com/api/v3')                            
                             buildOriginBranch(true)
                             buildOriginPRMerge(true)
                             includes("dev prod PR*")
@@ -384,7 +383,7 @@ controller:
                         periodic(1)
                         }
                     }
-   
+
     #  welcome-message: |
     #    jenkins:
     #      systemMessage: Welcome to our CI\CD server.  This Jenkins is configured and managed 'as code'.
@@ -649,7 +648,7 @@ agent:
   namespace:
   image: "jenkins/inbound-agent"
   tag: "4.6-1"
-  workingDir: "/home/jenkins/agent"
+  workingDir: "/home/jenkins"
   customJenkinsLabels: []
   # name of the secret to be used for image pulling
   imagePullSecretName:
@@ -674,7 +673,7 @@ agent:
   # Allowed types are: ConfigMap, EmptyDir, HostPath, Nfs, PVC, Secret
   # Configure the attributes as they appear in the corresponding Java class for that type
   # https://github.com/jenkinsci/kubernetes-plugin/tree/master/src/main/java/org/csanchez/jenkins/plugins/kubernetes/volumes
-  volumes: 
+  volumes: []
   # - type: ConfigMap
   #   configMapName: myconfigmap
   #   mountPath: /var/myapp/myconfigmap
@@ -693,14 +692,10 @@ agent:
   #   claimName: mypvc
   #   mountPath: /var/myapp/mypvc
   #   readOnly: false
-    - type: Secret
-      defaultMode: "600"
-      mountPath: /run/secrets
-      secretName: github-secrets
-    - type: Secret
-      defaultMode: "600"
-      mountPath: /run/secrets
-      secretName: jenkins-k8s-config      
+  # - type: Secret
+  #   defaultMode: "600"
+  #   mountPath: /var/myapp/mysecret
+  #   secretName: mysecret
   # Pod-wide environment, these vars are visible to any container in the agent pod
 
   # You can define the workspaceVolume that you want to mount for this container
@@ -722,7 +717,7 @@ agent:
   #   claimName: mypvc
   #   readOnly: false
   # Pod-wide environment, these vars are visible to any container in the agent pod
-  # envVars:        
+  envVars: []
   # - name: PATH
   #   value: /usr/local/bin
   nodeSelector: {}
@@ -769,7 +764,7 @@ agent:
   # For this pod templates configuration to be loaded the following values must be set:
   # controller.JCasC.defaultConfig: true
   # Best reference is https://<jenkins_url>/configuration-as-code/reference#Cloud-kubernetes. The example below creates a python pod template.
-  # podTemplates:   
+  podTemplates: {}
   #  python: |
   #    - name: python
   #      label: jenkins-python
@@ -851,7 +846,7 @@ networkPolicy:
 ## Install Default RBAC roles and bindings
 rbac:
   create: true
-  readSecrets: true
+  readSecrets: false
 
 serviceAccount:
   create: true
@@ -934,3 +929,4 @@ backup:
   #  drop:
   #    - NET_RAW
 checkDeprecation: true
+
