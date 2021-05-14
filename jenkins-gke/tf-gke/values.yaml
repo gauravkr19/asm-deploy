@@ -237,7 +237,7 @@ controller:
     - docker-custom-build-environment:latest
     - credentials:latest
     - docker-commons:latest
-    - docker-workflow:latest
+    - docker-workflow:1.24
     - job-dsl:latest
     - jdk-tool:latest
 
@@ -303,7 +303,7 @@ controller:
                                 - name: "jnlp"
                                   image: "jenkins/jnlp-slave"                                  
                                   alwaysPullImage: false
-                                  workingDir: "/home/jenkins"
+                                  workingDir: "/home/jenkins/agent"
                                   ttyEnabled: true
                                   command: ""
                                   args: ""
@@ -327,12 +327,12 @@ controller:
                                 - name: "terraform"
                                   image: "hashicorp/terraform:0.12.29"
                                   alwaysPullImage: false
-                                  workingDir: "/home/jenkins"
+                                  workingDir: "/home/jenkins/agent"
                                   ttyEnabled: true
                                   command: "/bin/sh -c"
                                   args: "cat"
-                                  resourceRequestCpu: "100m"
-                                  resourceLimitCpu: "500m"
+                                  resourceRequestCpu: "900m"
+                                  resourceLimitCpu: "1000m"
                                   resourceRequestMemory: "500Mi"
                                   resourceLimitMemory: "1Gi"
                               volumes:
@@ -368,7 +368,6 @@ controller:
                             scanCredentialsId('github-token')
                             repoOwner("${GITHUB_USERNAME}")
                             repository("${GITHUB_REPO}")
-                            apiUri('https://github.dxc.com/api/v3')                            
                             buildOriginBranch(true)
                             buildOriginPRMerge(true)
                             includes("dev prod PR*")
@@ -648,7 +647,7 @@ agent:
   namespace:
   image: "jenkins/inbound-agent"
   tag: "4.6-1"
-  workingDir: "/home/jenkins"
+  workingDir: "/home/jenkins/agent"
   customJenkinsLabels: []
   # name of the secret to be used for image pulling
   imagePullSecretName:
