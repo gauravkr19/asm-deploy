@@ -16,7 +16,7 @@ gcurl "https://serviceusage.googleapis.com/v1/projects/${PROJECT_NUMBER}/service
  *****************************************/
 module "enables-google-apis" {
   source  = "terraform-google-modules/project-factory/google//modules/project_services"
-  version = "10.1.1"
+  version = "6.0.0"
 
   project_id = var.project_id
 
