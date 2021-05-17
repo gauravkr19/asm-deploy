@@ -1,4 +1,4 @@
-project_id = "playground-s-11-4536b96a"
+project_id = "playground-s-11-f3845345"
 environment = "prod"
 subnet1_region = "us-central1"
 subnet1_zone = "us-central1-a"
