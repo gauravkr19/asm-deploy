@@ -16,7 +16,7 @@ gcurl "https://serviceusage.googleapis.com/v1/projects/${PROJECT_NUMBER}/service
  *****************************************/
 module "enables-google-apis" {
   source  = "terraform-google-modules/project-factory/google//modules/project_services"
-  version = "6.0.0"
+  version = "10.1.1"
 
   project_id = var.project_id
 
@@ -189,7 +189,7 @@ resource "helm_release" "jenkins" {
   name       = "jenkins"
   repository = "https://charts.jenkins.io"
   chart      = "jenkins"
- # version    = "1.9.18"
+  version    = "3.3.10"
   timeout    = 1200
   values = [data.local_file.helm_chart_values.content]
   depends_on = [
