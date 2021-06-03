@@ -79,8 +79,8 @@ module "jenkins-gke" {
   regional                 = false
   region                   = var.region
   zones                    = var.zones
-  network                  = default
-  subnetwork               = default
+  network                  = "default"
+  subnetwork               = "default"
   ip_range_pods            = ""
   ip_range_services        = ""
   logging_service          = "logging.googleapis.com/kubernetes"

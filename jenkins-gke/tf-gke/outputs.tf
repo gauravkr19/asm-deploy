@@ -56,12 +56,16 @@ output "jenkins_k8s_config_secrets" {
   value       = var.jenkins_k8s_config
 }
 
-output "jenkins_project_id" {
-  description = "Project id of Jenkins GKE project"
-  value       = module.enables-google-apis.project_id
-}
+# output "jenkins_project_id" {
+#   description = "Project id of Jenkins GKE project"
+#   value       = module.enables-google-apis.project_id
+# }
 
 output "zone" {
   description = "Zone of Jenkins GKE cluster"
   value       = join(",", var.zones)
+}
+
+output "project" {
+  value = data.google_client_config.current.project
 }
