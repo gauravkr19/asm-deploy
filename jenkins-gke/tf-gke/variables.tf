@@ -86,15 +86,7 @@ variable "subnet_cidr" {
   description = "subnet cidr range"
 }
 
-# variable "network_name" {
-#   description = "Name for the VPC network"
-#   default     = "jenkins-network"
-# }
-# variable "subnet_ip" {
-#   description = "IP range for the subnet"
-#   default     = "10.2.0.0/16"
-# }
-# variable "subnet_name" {
-#   description = "Name for the subnet"
-#   default     = "jenkins-subnet"
-# }
+variable clusname {
+  default     = "jenkins-gke"
+  description = "GKE cluster name"
+}

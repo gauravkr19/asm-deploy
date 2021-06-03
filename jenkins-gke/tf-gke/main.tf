@@ -47,13 +47,14 @@ module "project-services" {
 # Network Resources for Jenkins Cluster
 resource "google_compute_network" "vpc" {
   name                    = "jenkins-vpc"
+  project                 = var.project_id
   auto_create_subnetworks = "false"
   depends_on              = [module.project-services.project_id]  
 }
 resource "google_compute_subnetwork" "subnet" {
   name          = "jenkins-subnet"
   region        = var.region
-  project       = var.project_name
+  project       = var.project_id
   network       = google_compute_network.vpc.self_link
   ip_cidr_range = var.subnet_cidr
 
@@ -78,7 +79,7 @@ module "jenkins-gke" {
   source                   = "terraform-google-modules/kubernetes-engine/google//modules/beta-public-cluster/"
   version                  = "13.0.0"
   project_id               = data.google_client_config.default.project
-  name                     = jenkins-gke
+  name                     = var.clusname
   regional                 = false
   region                   = var.region
   zones                    = var.zones
