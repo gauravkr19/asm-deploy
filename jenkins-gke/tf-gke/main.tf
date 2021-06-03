@@ -52,10 +52,10 @@ resource "google_compute_network" "vpc" {
   depends_on              = [module.project-services.project_id]  
 }
 resource "google_compute_subnetwork" "subnet" {
-  name          = var.subnetwork
+  name          = "jenkins-subnet"
   region        = var.region
   project       = var.project_id
-  network       = google_compute_network.vpc.self_link
+  network       = google_compute_network.vpc.name
   ip_cidr_range = var.subnet_cidr
 
   secondary_ip_range {
