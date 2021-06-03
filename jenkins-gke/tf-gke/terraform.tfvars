@@ -3,7 +3,7 @@
 project_id = "playground-s-11-8ba20866"
 tfstate_gcs_backend = "playground-s-11-8ba20866-tfstate"
 region = "us-central1"
-zones = ["us-central1-b", "us-central1-c"]
+zones = ["us-central1-b"]
 # ip_range_pods_name = "ip-range-pods"
 # ip_range_services_name = "ip-range-scv"
 # network_name = "jenkins-network"
