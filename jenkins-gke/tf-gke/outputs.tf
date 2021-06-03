@@ -67,5 +67,5 @@ output "zone" {
 }
 
 output "project" {
-  value = data.google_client_config.current.project
+  value = data.google_client_config.default.project
 }
