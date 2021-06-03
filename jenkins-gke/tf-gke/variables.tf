@@ -73,3 +73,9 @@ variable "github_repo" {
   description = "Github repo name."
   default     = "terraform-jenkins-pipeline"
 }
+
+variable "clusname" {
+  type        = string
+  default     = "jenkins"
+  description = "Jenkins Cluster-Name"
+}

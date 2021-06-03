@@ -75,7 +75,7 @@ module "jenkins-gke" {
   source                   = "terraform-google-modules/kubernetes-engine/google//modules/beta-public-cluster/"
   version                  = "13.0.0"
   project_id               = data.google_client_config.default.project
-  name                     = "jenkins"
+  name                     = var.clusname
   regional                 = false
   region                   = var.region
   zones                    = var.zones
@@ -203,3 +203,37 @@ resource "helm_release" "jenkins" {
   ]
 }
 
+#Anthos - Make this Anthos Cluster
+
+module "asm" {
+  source           = "terraform-google-modules/kubernetes-engine/google//modules/asm"
+
+  project_id       = data.google_client_config.default.project
+  cluster_name     = var.clusname
+  location         = module.jenkins-gke.location
+  cluster_endpoint = module.jenkins-gke.endpoint
+}
+
+
+# module "acm" {
+# source           = "terraform-google-modules/kubernetes-engine/google//modules/acm"
+
+#   project_id       = data.google_client_config.default.project
+#   cluster_name     = var.clusname
+#   location         = module.jenkins-gke.location
+#   cluster_endpoint = module.jenkins-gke.endpoint
+
+#   sync_repo        = "git@github.com:GoogleCloudPlatform/csp-config-management.git"
+#   sync_branch      = "1.0.0"
+#   policy_dir       = "foo-corp"
+# }
+
+
+module "hub" {
+source           = "terraform-google-modules/kubernetes-engine/google//modules/hub"
+
+  project_id       = data.google_client_config.default.project
+  cluster_name     = var.clusname
+  location         = module.jenkins-gke.location
+  cluster_endpoint = module.jenkins-gke.endpoint
+}
