@@ -14,54 +14,58 @@ gcurl "https://serviceusage.googleapis.com/v1/projects/${PROJECT_NUMBER}/service
 /*****************************************
   Activate Services in Jenkins Project
  *****************************************/
-module "enables-google-apis" {
-  source  = "terraform-google-modules/project-factory/google//modules/project_services"
-  version = "6.0.0"
+# module "enables-google-apis" {
+#   source  = "terraform-google-modules/project-factory/google//modules/project_services"
+#   version = "6.0.0"
 
-  project_id = var.project_id
+#   project_id = var.project_id
 
-  activate_apis = [
-    "iam.googleapis.com",
-    "cloudresourcemanager.googleapis.com",
-    "compute.googleapis.com",
-    "containerregistry.googleapis.com",
-    "container.googleapis.com",
-    "storage-component.googleapis.com",
-    "logging.googleapis.com",
-    "monitoring.googleapis.com",
-  ]
-}
+#   activate_apis = [
+#     "iam.googleapis.com",
+#     "cloudresourcemanager.googleapis.com",
+#     "compute.googleapis.com",
+#     "containerregistry.googleapis.com",
+#     "container.googleapis.com",
+#     "storage-component.googleapis.com",
+#     "logging.googleapis.com",
+#     "monitoring.googleapis.com",
+#   ]
+# }
 
 /*****************************************
   Jenkins VPC
  *****************************************/
-module "jenkins-vpc" {
-  source  = "terraform-google-modules/network/google"
-  version = "~> 2.0"
+# module "jenkins-vpc" {
+#   source  = "terraform-google-modules/network/google"
+#   version = "~> 2.0"
 
-  project_id   = module.enables-google-apis.project_id
-  network_name = var.network_name
+#   project_id   = data.google_client_config.default.project
+#   network_name = var.network_name
 
-  subnets = [
-    {
-      subnet_name   = var.subnet_name
-      subnet_ip     = "10.0.0.0/17"
-      subnet_region = var.region
-    },
-  ]
+#   subnets = [
+#     {
+#       subnet_name   = var.subnet_name
+#       subnet_ip     = "10.0.0.0/17"
+#       subnet_region = var.region
+#     },
+#   ]
 
-  secondary_ranges = {
-    "${var.subnet_name}" = [
-      {
-        range_name    = var.ip_range_pods_name
-        ip_cidr_range = "192.168.0.0/18"
-      },
-      {
-        range_name    = var.ip_range_services_name
-        ip_cidr_range = "192.168.64.0/18"
-      },
-    ]
-  }
+#   secondary_ranges = {
+#     "${var.subnet_name}" = [
+#       {
+#         range_name    = var.ip_range_pods_name
+#         ip_cidr_range = "192.168.0.0/18"
+#       },
+#       {
+#         range_name    = var.ip_range_services_name
+#         ip_cidr_range = "192.168.64.0/18"
+#       },
+#     ]
+#   }
+# }
+
+data "google_project" "project" {
+  project_id = var.project_id
 }
 
 /*****************************************
@@ -69,31 +73,33 @@ module "jenkins-vpc" {
  *****************************************/
 module "jenkins-gke" {
   source                   = "terraform-google-modules/kubernetes-engine/google//modules/beta-public-cluster/"
-  version                  = "~> 7.0"
-  project_id               = module.enables-google-apis.project_id
+  version                  = "13.0.0"
+  project_id               = data.google_client_config.default.project
   name                     = "jenkins"
   regional                 = false
   region                   = var.region
   zones                    = var.zones
-  network                  = module.jenkins-vpc.network_name
-  subnetwork               = module.jenkins-vpc.subnets_names[0]
-  ip_range_pods            = var.ip_range_pods_name
-  ip_range_services        = var.ip_range_services_name
+  network                  = default
+  subnetwork               = default
+  ip_range_pods            = ""
+  ip_range_services        = ""
   logging_service          = "logging.googleapis.com/kubernetes"
   monitoring_service       = "monitoring.googleapis.com/kubernetes"
   remove_default_node_pool = true
   service_account          = "create"
-  identity_namespace       = "${module.enables-google-apis.project_id}.svc.id.goog"
+  identity_namespace       = "${data.google_client_config.default.project}.svc.id.goog"
   node_metadata            = "GKE_METADATA_SERVER"
+  cluster_resource_labels  = { "mesh_id" : "proj-${data.google_project.project.number}" }
   node_pools = [
     {
       name               = "butler-pool"
       node_count         = 1
+      node_locations     = "us-central1-b,us-central1-c"
       min_count          = 1
       max_count          = 2
       preemptible        = true
       machine_type       = "n1-standard-2"
-      disk_size_gb       = 20
+      disk_size_gb       = 50
       disk_type          = "pd-standard"
       image_type         = "COS"
       auto_repair        = true    
@@ -106,7 +112,7 @@ module "jenkins-gke" {
  *****************************************/
 # allow GKE to pull images from GCR
 resource "google_project_iam_member" "gke" {
-  project = module.enables-google-apis.project_id
+  project = data.google_client_config.default.project
   role    = "roles/storage.objectViewer"
 
   member = "serviceAccount:${module.jenkins-gke.service_account}"
@@ -117,8 +123,8 @@ resource "google_project_iam_member" "gke" {
  *****************************************/
 module "workload_identity" {
   source              = "terraform-google-modules/kubernetes-engine/google//modules/workload-identity"
-  version             = "~> 7.0"
-  project_id          = module.enables-google-apis.project_id
+  version             = "14.3.0"
+  project_id          = data.google_client_config.default.project
   name                = "jenkins-wi-${module.jenkins-gke.name}"
   namespace           = "default"
   use_existing_k8s_sa = false
@@ -126,7 +132,7 @@ module "workload_identity" {
 
 # enable GSA to add and delete pods for jenkins builders
 resource "google_project_iam_member" "cluster-dev" {
-  project = module.enables-google-apis.project_id
+  project = data.google_client_config.default.project
   role    = "roles/container.developer"
   member  = module.workload_identity.gcp_service_account_fqn
 }
@@ -142,7 +148,7 @@ resource "kubernetes_secret" "jenkins-secrets" {
     name = var.jenkins_k8s_config
   }
   data = {
-    project_id          = module.enables-google-apis.project_id
+    project_id          = data.google_client_config.default.project
     kubernetes_endpoint = "https://${module.jenkins-gke.endpoint}"
     ca_certificate      = module.jenkins-gke.ca_certificate
     jenkins_tf_ksa      = module.workload_identity.k8s_service_account_name
@@ -177,7 +183,7 @@ resource "google_storage_bucket_iam_member" "tf-state-writer" {
   Grant Jenkins SA Permissions project editor
  *****************************************/
 resource "google_project_iam_member" "jenkins-project" {
-  project = module.enables-google-apis.project_id
+  project = data.google_client_config.default.project
   role    = "roles/editor"
   member = module.workload_identity.gcp_service_account_fqn
 }
