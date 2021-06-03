@@ -52,7 +52,7 @@ resource "google_compute_network" "vpc" {
   depends_on              = [module.project-services.project_id]  
 }
 resource "google_compute_subnetwork" "subnet" {
-  name          = "jenkins-subnet"
+  name          = var.subnetwork
   region        = var.region
   project       = var.project_id
   network       = google_compute_network.vpc.self_link
