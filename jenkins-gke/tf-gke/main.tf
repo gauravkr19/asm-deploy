@@ -1,68 +1,71 @@
 /*
-iam.googleapis.com
-cloudresourcemanager.googleapis.com
-compute.googleapis.com
-containerregistry.googleapis.com
-container.googleapis.com
-storage-component.googleapis.com
-logging.googleapis.com
-monitoring.googleapis.com
-serviceusage.googleapis.com
+gcloud services enable \
+iam.googleapis.com \
+cloudresourcemanager.googleapis.com \
+compute.googleapis.com \
+containerregistry.googleapis.com \
+container.googleapis.com \
+storage-component.googleapis.com \
+logging.googleapis.com \
+monitoring.googleapis.com \
+serviceusage.googleapis.com \
+meshca.googleapis.com \
+stackdriver.googleapis.com \
+meshconfig.googleapis.com \
+meshtelemetry.googleapis.com \
+cloudtrace.googleapis.com 
 gcurl "https://serviceusage.googleapis.com/v1/projects/${PROJECT_NUMBER}/services?filter=state:DISABLED"
 */
 
 /*****************************************
   Activate Services in Jenkins Project
  *****************************************/
-# module "enables-google-apis" {
-#   source  = "terraform-google-modules/project-factory/google//modules/project_services"
-#   version = "6.0.0"
+module "project-services" {
+  source  = "terraform-google-modules/project-factory/google//modules/project_services"
 
-#   project_id = var.project_id
+  project_id  = data.google_client_config.default.project
+  disable_services_on_destroy = false
+  activate_apis = [
+    "compute.googleapis.com",
+    "iam.googleapis.com",
+    "container.googleapis.com",
+    "cloudresourcemanager.googleapis.com",
+    "anthos.googleapis.com",
+    "cloudtrace.googleapis.com",
+    "meshca.googleapis.com",
+    "meshtelemetry.googleapis.com",
+    "meshconfig.googleapis.com",
+    "iamcredentials.googleapis.com",
+    "gkeconnect.googleapis.com",
+    "gkehub.googleapis.com",
+    "monitoring.googleapis.com",
+    "logging.googleapis.com"
 
-#   activate_apis = [
-#     "iam.googleapis.com",
-#     "cloudresourcemanager.googleapis.com",
-#     "compute.googleapis.com",
-#     "containerregistry.googleapis.com",
-#     "container.googleapis.com",
-#     "storage-component.googleapis.com",
-#     "logging.googleapis.com",
-#     "monitoring.googleapis.com",
-#   ]
-# }
+  ]
+}
 
-/*****************************************
-  Jenkins VPC
- *****************************************/
-# module "jenkins-vpc" {
-#   source  = "terraform-google-modules/network/google"
-#   version = "~> 2.0"
+# Network Resources for Jenkins Cluster
+resource "google_compute_network" "vpc" {
+  name                    = "jenkins-vpc"
+  auto_create_subnetworks = "false"
+  depends_on              = [module.project-services.project_id]  
+}
+resource "google_compute_subnetwork" "subnet" {
+  name          = "jenkins-subnet"
+  region        = var.region
+  project       = var.project_name
+  network       = google_compute_network.vpc.self_link
+  ip_cidr_range = var.subnet_cidr
 
-#   project_id   = data.google_client_config.default.project
-#   network_name = var.network_name
-
-#   subnets = [
-#     {
-#       subnet_name   = var.subnet_name
-#       subnet_ip     = "10.0.0.0/17"
-#       subnet_region = var.region
-#     },
-#   ]
-
-#   secondary_ranges = {
-#     "${var.subnet_name}" = [
-#       {
-#         range_name    = var.ip_range_pods_name
-#         ip_cidr_range = "192.168.0.0/18"
-#       },
-#       {
-#         range_name    = var.ip_range_services_name
-#         ip_cidr_range = "192.168.64.0/18"
-#       },
-#     ]
-#   }
-# }
+  secondary_ip_range {
+    range_name    = "pod-cidr-name"
+    ip_cidr_range = var.ip_cidr_subnet_pods
+  }
+  secondary_ip_range {
+    range_name    = "service-cidr-name"
+    ip_cidr_range = var.ip_cidr_subnet_services
+  }  
+}
 
 data "google_project" "project" {
   project_id = var.project_id
@@ -75,14 +78,14 @@ module "jenkins-gke" {
   source                   = "terraform-google-modules/kubernetes-engine/google//modules/beta-public-cluster/"
   version                  = "13.0.0"
   project_id               = data.google_client_config.default.project
-  name                     = var.clusname
+  name                     = jenkins-gke
   regional                 = false
   region                   = var.region
   zones                    = var.zones
-  network                  = "default"
-  subnetwork               = "default"
-  ip_range_pods            = ""
-  ip_range_services        = ""
+  network                  = var.network
+  subnetwork               = var.subnetwork
+  ip_range_pods            = var.ip_range_pods
+  ip_range_services        = var.ip_range_services
   logging_service          = "logging.googleapis.com/kubernetes"
   monitoring_service       = "monitoring.googleapis.com/kubernetes"
   remove_default_node_pool = true
@@ -90,6 +93,9 @@ module "jenkins-gke" {
   identity_namespace       = "${data.google_client_config.default.project}.svc.id.goog"
   node_metadata            = "GKE_METADATA_SERVER"
   cluster_resource_labels  = { "mesh_id" : "proj-${data.google_project.project.number}" }
+  network_policy             = true
+  http_load_balancing        = false
+  horizontal_pod_autoscaling = true  
   node_pools = [
     {
       name               = "butler-pool"
@@ -98,7 +104,7 @@ module "jenkins-gke" {
       min_count          = 1
       max_count          = 4
       preemptible        = true
-      machine_type       = "n1-standard-2"
+      machine_type       = "n1-standard-4"
       disk_size_gb       = 50
       disk_type          = "pd-standard"
       image_type         = "COS"
