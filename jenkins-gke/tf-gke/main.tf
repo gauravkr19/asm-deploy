@@ -83,8 +83,8 @@ module "jenkins-gke" {
   regional                 = false
   region                   = var.region
   zones                    = var.zones
-  network                  = var.network
-  subnetwork               = var.subnetwork
+  network                  = google_compute_network.vpc.name
+  subnetwork               = google_compute_subnetwork.subnet.name
   ip_range_pods            = var.ip_range_pods
   ip_range_services        = var.ip_range_services
   logging_service          = "logging.googleapis.com/kubernetes"
