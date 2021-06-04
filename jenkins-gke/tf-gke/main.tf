@@ -114,6 +114,13 @@ module "jenkins-gke" {
   ]
 }
 
+# resource "null_resource" "get-credentials" {
+#  depends_on = [module.jenkins-gke.name] 
+#  provisioner "local-exec" {
+#    command = "gcloud container clusters get-credentials ${module.jenkins-gke.name} --zone=${var.zones}"
+#  }
+# }
+
 /*****************************************
   IAM Bindings GKE SVC
  *****************************************/
@@ -144,8 +151,7 @@ resource "google_project_iam_member" "cluster-dev" {
   member  = module.workload_identity.gcp_service_account_fqn
 }
 
-data "google_client_config" "default" {
-}
+data "google_client_config" "default" { }
 
 /*****************************************
   K8S secrets for configuring K8S executers
@@ -202,16 +208,16 @@ resource "helm_release" "jenkins" {
   name       = "jenkins"
   repository = "https://charts.jenkins.io"
   chart      = "jenkins"
-  #version    = "3.3.10"
+  #version   = "3.3.10"
   timeout    = 1200
-  values = [data.local_file.helm_chart_values.content]
+  values     = [data.local_file.helm_chart_values.content]
   depends_on = [
-    kubernetes_secret.gh-secrets,
+    kubernetes_secret.gh-secrets, 
+    #null_resource.get-credentials,
   ]
 }
 
 #Anthos - Make this Anthos Cluster
-
 module "asm" {
   source           = "terraform-google-modules/kubernetes-engine/google//modules/asm"
 
@@ -223,18 +229,18 @@ module "asm" {
 }
 
 
-# module "acm" {
-# source           = "terraform-google-modules/kubernetes-engine/google//modules/acm"
+module "acm" {
+source           = "terraform-google-modules/kubernetes-engine/google//modules/acm"
 
-#   project_id       = data.google_client_config.default.project
-#   cluster_name     = var.clusname
-#   location         = module.jenkins-gke.location
-#   cluster_endpoint = module.jenkins-gke.endpoint
+  project_id       = data.google_client_config.default.project
+  cluster_name     = var.clusname
+  location         = module.jenkins-gke.location
+  cluster_endpoint = module.jenkins-gke.endpoint
 
-#   sync_repo        = "git@github.com:GoogleCloudPlatform/csp-config-management.git"
-#   sync_branch      = "1.0.0"
-#   policy_dir       = "foo-corp"
-# }
+  sync_repo        = "git@github.com:GoogleCloudPlatform/csp-config-management.git"
+  sync_branch      = "1.0.0"
+  policy_dir       = "foo-corp"
+}
 
 
 module "hub" {
