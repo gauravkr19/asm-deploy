@@ -18,18 +18,15 @@
   Google Provider Configuration
  *****************************************/
 provider "google" {
-  version = "~>  3.1"
-}
-
-provider "google-beta" {
-  version = "~>  3.1"
+  project = var.project_id
+  region  = var.region
 }
 
 /*****************************************
   Kubernetes provider configuration
  *****************************************/
 provider "kubernetes" {
-  version                = "~> 1.10"
+  #version                = "~> 1.10"
   load_config_file       = false
   host                   = module.jenkins-gke.endpoint
   token                  = data.google_client_config.default.access_token
@@ -41,9 +38,9 @@ provider "kubernetes" {
  *****************************************/
 module "gke_auth" {
   source  = "terraform-google-modules/kubernetes-engine/google//modules/auth"
-  version = "~> 9.1"
+  #version = "~> 9.1"
 
-  project_id   = module.enables-google-apis.project_id
+  project_id   = data.google_client_config.default.project
   cluster_name = module.jenkins-gke.name
   location     = module.jenkins-gke.location
 }
@@ -51,7 +48,7 @@ module "gke_auth" {
 provider "helm" {
   kubernetes {
     //load_config_file       = false
-    config_path            = "/home/cloud_user/.kube/config"
+    config_path            = "~/.kube/config"
     cluster_ca_certificate = module.gke_auth.cluster_ca_certificate
     host                   = module.gke_auth.host
     token                  = module.gke_auth.token

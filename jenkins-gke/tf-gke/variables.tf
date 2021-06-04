@@ -33,29 +33,6 @@ variable "zones" {
   default     = ["us-east4-a"]
 }
 
-variable "ip_range_pods_name" {
-  description = "The secondary ip range to use for pods"
-  default     = "ip-range-pods"
-}
-
-variable "ip_range_services_name" {
-  description = "The secondary ip range to use for pods"
-  default     = "ip-range-scv"
-}
-
-variable "network_name" {
-  description = "Name for the VPC network"
-  default     = "jenkins-network"
-}
-variable "subnet_ip" {
-  description = "IP range for the subnet"
-  default     = "10.10.10.0/24"
-}
-variable "subnet_name" {
-  description = "Name for the subnet"
-  default     = "jenkins-subnet"
-}
-
 variable "jenkins_k8s_config" {
   description = "Name for the k8s secret required to configure k8s executers on Jenkins"
   default     = "jenkins-k8s-config"
@@ -72,4 +49,44 @@ variable "github_token" {
 variable "github_repo" {
   description = "Github repo name."
   default     = "terraform-jenkins-pipeline"
+}
+
+variable "network" {
+  description = "The name of the network to run the cluster"
+  default     = "jenkins-vpc"
+}
+
+variable "subnetwork" {
+  description = "The name of the subnet to run the cluster"
+  default     = "jenkins-subnet"
+}
+
+variable "ip_range_pods" {
+  description = "The secondary range name for the pods"
+  default     = "pod-cidr-name"
+}
+
+variable "ip_range_services" {
+  description = "The secondary range name for the services"
+  default     = "service-cidr-name"
+}
+
+variable "ip_cidr_subnet_pods" {
+  description = "The secondary ip range to use for pods"
+  default     = "172.16.0.0/16"
+}
+
+variable "ip_cidr_subnet_services" {
+  description = "The secondary ip range to use for pods"
+  default     = "192.168.2.0/24"
+}
+
+variable "subnet_cidr" {
+  default     = "10.2.0.0/16"
+  description = "subnet cidr range"
+}
+
+variable clusname {
+  default     = "jenkins-gke"
+  description = "GKE cluster name"
 }
