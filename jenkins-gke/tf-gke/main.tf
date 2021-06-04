@@ -219,7 +219,7 @@ module "asm" {
   cluster_name     = var.clusname
   location         = module.jenkins-gke.location
   cluster_endpoint = module.jenkins-gke.endpoint
-  asm_dir          = "asm-dir-${module.primary-cluster.name}"
+  asm_dir          = "asm-dir-${module.jenkins-gke.name}"
 }
 
 
