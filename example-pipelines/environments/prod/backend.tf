@@ -15,7 +15,7 @@
 
 terraform {
   backend "gcs" {
-    bucket = "playground-s-11-a8152cfb-tfstate"
+    bucket = "playground-s-11-ed822a68-tfstate"
     prefix = "env/prod"
   }
 }

@@ -114,12 +114,12 @@ module "jenkins-gke" {
   ]
 }
 
-# resource "null_resource" "get-credentials" {
-#  depends_on = [module.jenkins-gke.name] 
-#  provisioner "local-exec" {
-#    command = "gcloud container clusters get-credentials ${module.jenkins-gke.name} --zone=${var.zones}"
-#  }
-# }
+resource "null_resource" "get-credentials" {
+ depends_on = [module.jenkins-gke.name] 
+ provisioner "local-exec" {
+   command = "gcloud container clusters get-credentials ${module.jenkins-gke.name} --zone ${module.jenkins-gke.zones}"
+ }
+
 
 /*****************************************
   IAM Bindings GKE SVC
@@ -213,7 +213,7 @@ resource "helm_release" "jenkins" {
   values     = [data.local_file.helm_chart_values.content]
   depends_on = [
     kubernetes_secret.gh-secrets, 
-    #null_resource.get-credentials,
+    null_resource.get-credentials,
   ]
 }
 
@@ -226,6 +226,7 @@ module "asm" {
   location         = module.jenkins-gke.location
   cluster_endpoint = module.jenkins-gke.endpoint
   asm_dir          = "asm-dir-${module.jenkins-gke.name}"
+  depends_on       = [module.hub.cluster_name]
 }
 
 
@@ -236,6 +237,7 @@ source           = "terraform-google-modules/kubernetes-engine/google//modules/a
   cluster_name     = var.clusname
   location         = module.jenkins-gke.location
   cluster_endpoint = module.jenkins-gke.endpoint
+  depends_on       = [module.asm.cluster_name]
 
   sync_repo        = "git@github.com:GoogleCloudPlatform/csp-config-management.git"
   sync_branch      = "1.0.0"
@@ -250,4 +252,5 @@ source           = "terraform-google-modules/kubernetes-engine/google//modules/h
   cluster_name     = var.clusname
   location         = module.jenkins-gke.location
   cluster_endpoint = module.jenkins-gke.endpoint
+  depends_on       = [helm_release.jenkins.name]
 }
