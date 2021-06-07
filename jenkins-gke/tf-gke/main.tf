@@ -117,7 +117,7 @@ module "jenkins-gke" {
 resource "null_resource" "get-credentials" {
  depends_on = [module.jenkins-gke.name] 
  provisioner "local-exec" {
-   command = "gcloud container clusters get-credentials ${module.jenkins-gke.name} --zone ${module.jenkins-gke.zones}"   
+   command = "gcloud container clusters get-credentials ${module.jenkins-gke.name} --zone=${jsonencode(var.zones)}"   
   }
 }
 
@@ -254,5 +254,5 @@ resource "helm_release" "jenkins" {
 #   cluster_name     = var.clusname
 #   location         = module.jenkins-gke.location
 #   cluster_endpoint = module.jenkins-gke.endpoint
-#   #depends_on       = [helm_release.jenkins]
+#   depends_on       = [helm_release.jenkins]
 # }
