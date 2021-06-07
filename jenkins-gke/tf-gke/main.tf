@@ -228,7 +228,6 @@ module "asm" {
   location         = module.jenkins-gke.location
   cluster_endpoint = module.jenkins-gke.endpoint
   asm_dir          = "asm-dir-${module.jenkins-gke.name}"
-  #depends_on       = [module.hub.cluster_name]
 }
 
 
@@ -239,7 +238,6 @@ source           = "terraform-google-modules/kubernetes-engine/google//modules/a
   cluster_name     = var.clusname
   location         = module.jenkins-gke.location
   cluster_endpoint = module.jenkins-gke.endpoint
-  #depends_on       = [module.asm.cluster_name]
 
   sync_repo        = "git@github.com:GoogleCloudPlatform/csp-config-management.git"
   sync_branch      = "1.0.0"
