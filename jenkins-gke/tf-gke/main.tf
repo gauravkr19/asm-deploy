@@ -114,12 +114,12 @@ module "jenkins-gke" {
   ]
 }
 
-# resource "null_resource" "get-credentials" {
-#  depends_on = [module.jenkins-gke.name] 
-#  provisioner "local-exec" {
-#    command = "gcloud container clusters get-credentials ${module.jenkins-gke.name} --zone=${jsonencode(var.zones)}"   
-#   }
-# }
+ resource "null_resource" "get-credentials" {
+  depends_on = [module.jenkins-gke.name] 
+  provisioner "local-exec" {
+    command = "gcloud container clusters get-credentials ${module.jenkins-gke.name} --zone=${jsonencode(var.zones)}"   
+   }
+ }
 
 
 /*****************************************
@@ -214,7 +214,7 @@ resource "helm_release" "jenkins" {
   values     = [data.local_file.helm_chart_values.content]
   depends_on = [
     kubernetes_secret.gh-secrets, 
-    #null_resource.get-credentials,
+    null_resource.get-credentials,
   ]
 }
 
