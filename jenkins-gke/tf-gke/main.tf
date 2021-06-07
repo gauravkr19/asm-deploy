@@ -80,7 +80,7 @@ module "jenkins-gke" {
   version                  = "13.0.0"
   project_id               = data.google_client_config.default.project
   name                     = var.clusname
-  regional                 = false
+  regional                 = true
   region                   = var.region
   zones                    = var.zones
   network                  = google_compute_network.vpc.name
