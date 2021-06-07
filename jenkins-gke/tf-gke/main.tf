@@ -218,8 +218,17 @@ resource "helm_release" "jenkins" {
   ]
 }
 
-
 #Anthos - Make this Anthos Cluster
+module "hub" {
+source           = "terraform-google-modules/kubernetes-engine/google//modules/hub"
+
+  project_id       = data.google_client_config.default.project
+  cluster_name     = var.clusname
+  location         = module.jenkins-gke.location
+  cluster_endpoint = module.jenkins-gke.endpoint
+  depends_on       = [helm_release.jenkins]
+}
+
 module "asm" {
   source           = "terraform-google-modules/kubernetes-engine/google//modules/asm"
 
@@ -244,13 +253,3 @@ source           = "terraform-google-modules/kubernetes-engine/google//modules/a
   policy_dir       = "foo-corp"
 }
 
-
-module "hub" {
-source           = "terraform-google-modules/kubernetes-engine/google//modules/hub"
-
-  project_id       = data.google_client_config.default.project
-  cluster_name     = var.clusname
-  location         = module.jenkins-gke.location
-  cluster_endpoint = module.jenkins-gke.endpoint
-  depends_on       = [helm_release.jenkins]
-}
