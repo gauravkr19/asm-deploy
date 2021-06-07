@@ -118,7 +118,7 @@ module "jenkins-gke" {
 resource "null_resource" "get-credentials" {
  depends_on = [module.jenkins-gke.name] 
  provisioner "local-exec" {   
-   command = "gcloud container clusters get-credentials ${module.jenkins-gke.name} --zone=trim('us-central1-b')"   
+   command = "gcloud container clusters get-credentials ${module.jenkins-gke.name} --zone=${join(", ", var.zones)}  
   }
 }
 
