@@ -218,40 +218,41 @@ resource "helm_release" "jenkins" {
   ]
 }
 
-#Anthos - Make this Anthos Cluster
-module "asm" {
-  source           = "terraform-google-modules/kubernetes-engine/google//modules/asm"
 
-  project_id       = data.google_client_config.default.project
-  cluster_name     = var.clusname
-  location         = module.jenkins-gke.location
-  cluster_endpoint = module.jenkins-gke.endpoint
-  asm_dir          = "asm-dir-${module.jenkins-gke.name}"
-  depends_on       = [module.hub.cluster_name]
-}
+# #Anthos - Make this Anthos Cluster
+# module "asm" {
+#   source           = "terraform-google-modules/kubernetes-engine/google//modules/asm"
 
-
-module "acm" {
-source           = "terraform-google-modules/kubernetes-engine/google//modules/acm"
-
-  project_id       = data.google_client_config.default.project
-  cluster_name     = var.clusname
-  location         = module.jenkins-gke.location
-  cluster_endpoint = module.jenkins-gke.endpoint
-  depends_on       = [module.asm.cluster_name]
-
-  sync_repo        = "git@github.com:GoogleCloudPlatform/csp-config-management.git"
-  sync_branch      = "1.0.0"
-  policy_dir       = "foo-corp"
-}
+#   project_id       = data.google_client_config.default.project
+#   cluster_name     = var.clusname
+#   location         = module.jenkins-gke.location
+#   cluster_endpoint = module.jenkins-gke.endpoint
+#   asm_dir          = "asm-dir-${module.jenkins-gke.name}"
+#   #depends_on       = [module.hub.cluster_name]
+# }
 
 
-module "hub" {
-source           = "terraform-google-modules/kubernetes-engine/google//modules/hub"
+# module "acm" {
+# source           = "terraform-google-modules/kubernetes-engine/google//modules/acm"
 
-  project_id       = data.google_client_config.default.project
-  cluster_name     = var.clusname
-  location         = module.jenkins-gke.location
-  cluster_endpoint = module.jenkins-gke.endpoint
-  depends_on       = [helm_release.jenkins]
-}
+#   project_id       = data.google_client_config.default.project
+#   cluster_name     = var.clusname
+#   location         = module.jenkins-gke.location
+#   cluster_endpoint = module.jenkins-gke.endpoint
+#   #depends_on       = [module.asm.cluster_name]
+
+#   sync_repo        = "git@github.com:GoogleCloudPlatform/csp-config-management.git"
+#   sync_branch      = "1.0.0"
+#   policy_dir       = "foo-corp"
+# }
+
+
+# module "hub" {
+# source           = "terraform-google-modules/kubernetes-engine/google//modules/hub"
+
+#   project_id       = data.google_client_config.default.project
+#   cluster_name     = var.clusname
+#   location         = module.jenkins-gke.location
+#   cluster_endpoint = module.jenkins-gke.endpoint
+#   #depends_on       = [helm_release.jenkins]
+# }
