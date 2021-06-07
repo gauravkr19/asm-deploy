@@ -80,7 +80,7 @@ module "jenkins-gke" {
   version                  = "13.0.0"
   project_id               = data.google_client_config.default.project
   name                     = var.clusname
-  regional                 = false
+  regional                 = true
   region                   = var.region
   zones                    = var.zones
   network                  = google_compute_network.vpc.name
@@ -118,7 +118,7 @@ module "jenkins-gke" {
 resource "null_resource" "get-credentials" {
  depends_on = [module.jenkins-gke.name] 
  provisioner "local-exec" {   
-   command = "gcloud container clusters get-credentials ${module.jenkins-gke.name} --zone=${var.zones[0]}"
+   command = "gcloud container clusters get-credentials ${module.jenkins-gke.name} --zone=${var.zone}"
   }
 }
 
