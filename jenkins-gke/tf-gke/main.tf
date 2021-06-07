@@ -80,7 +80,7 @@ module "jenkins-gke" {
   version                  = "13.0.0"
   project_id               = data.google_client_config.default.project
   name                     = var.clusname
-  regional                 = true
+  regional                 = false
   region                   = var.region
   zones                    = var.zones
   network                  = google_compute_network.vpc.name
@@ -100,10 +100,10 @@ module "jenkins-gke" {
   node_pools = [
     {
       name               = "butler-pool"
-      node_count         = 2
+      node_count         = 1
       #node_locations     = "us-central1-b,us-central1-c"
       min_count          = 1
-      max_count          = 4
+      max_count          = 2
       preemptible        = true
       machine_type       = "n1-standard-2"
       disk_size_gb       = 50
@@ -112,6 +112,14 @@ module "jenkins-gke" {
       auto_repair        = true    
     }
   ]
+}
+
+#--zone=${element(jsonencode(var.zones), 0)}" 
+resource "null_resource" "get-credentials" {
+ depends_on = [module.jenkins-gke.name] 
+ provisioner "local-exec" {   
+   command = "gcloud container clusters get-credentials ${module.jenkins-gke.name} --zone=${var.region}"
+  }
 }
 
 /*****************************************
@@ -206,7 +214,7 @@ resource "helm_release" "jenkins" {
   values     = [data.local_file.helm_chart_values.content]
   depends_on = [
     kubernetes_secret.gh-secrets, 
-    #null_resource.get-credentials,
+    null_resource.get-credentials,
   ]
 }
 
