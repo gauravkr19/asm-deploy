@@ -253,5 +253,5 @@ source           = "terraform-google-modules/kubernetes-engine/google//modules/h
   cluster_name     = var.clusname
   location         = module.jenkins-gke.location
   cluster_endpoint = module.jenkins-gke.endpoint
-  depends_on       = [helm_release.jenkins.name]
+  depends_on       = [helm_release.jenkins]
 }
