@@ -226,7 +226,9 @@ source           = "terraform-google-modules/kubernetes-engine/google//modules/h
   cluster_name     = var.clusname
   location         = module.jenkins-gke.location
   cluster_endpoint = module.jenkins-gke.endpoint
-  #depends_on       = [helm_release.jenkins]
+  gke_hub_membership_name = "primary"
+  gke_hub_sa_name         = "primary"
+  #depends_on            = [helm_release.jenkins]
 }
 
 module "asm" {
