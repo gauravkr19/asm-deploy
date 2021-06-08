@@ -114,7 +114,7 @@ module "jenkins-gke" {
   ]
 }
 
-#--zone=${element(jsonencode(var.zones), 0)}" 
+#####--zone=${element(jsonencode(var.zones), 0)}" 
 resource "null_resource" "get-credentials" {
  depends_on = [module.jenkins-gke.name] 
  provisioner "local-exec" {   
@@ -226,7 +226,7 @@ source           = "terraform-google-modules/kubernetes-engine/google//modules/h
   cluster_name     = var.clusname
   location         = module.jenkins-gke.location
   cluster_endpoint = module.jenkins-gke.endpoint
-  depends_on       = [helm_release.jenkins]
+  #depends_on       = [helm_release.jenkins]
 }
 
 module "asm" {
