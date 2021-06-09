@@ -73,6 +73,22 @@ data "google_project" "project" {
   project_id = var.project_id
 }
 
+resource "kubernetes_cluster_role_binding" "user" {
+  metadata {
+    name = "terraform-example"
+  }
+  role_ref {
+    api_group = "rbac.authorization.k8s.io"
+    kind      = "ClusterRole"
+    name      = "cluster-admin"
+  }
+  subject {
+    kind      = "User"
+    name      = "${var.currentuser}"
+    api_group = "rbac.authorization.k8s.io"
+  }
+}
+
 /*****************************************
   Jenkins GKE
  *****************************************/
