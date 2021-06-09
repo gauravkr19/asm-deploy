@@ -68,6 +68,7 @@ resource "google_compute_subnetwork" "subnet" {
   }  
 }
 
+data "google_client_config" "default" { }
 data "google_project" "project" {
   project_id = var.project_id
 }
@@ -94,7 +95,7 @@ module "jenkins-gke" {
   identity_namespace       = "${data.google_client_config.default.project}.svc.id.goog"
   node_metadata            = "GKE_METADATA_SERVER"
   cluster_resource_labels  = { "mesh_id" : "proj-${data.google_project.project.number}" }
-  #network_policy             = true
+  network_policy             = true
   http_load_balancing        = false
   horizontal_pod_autoscaling = true  
   node_pools = [
@@ -102,7 +103,7 @@ module "jenkins-gke" {
       name               = "butler-pool"
       #node_count         = 2
       #node_locations     = "us-central1-b,us-central1-c"
-      min_count          = 2
+      min_count          = 4
       max_count          = 4
       preemptible        = true
       machine_type       = "n1-standard-2"
@@ -115,17 +116,6 @@ module "jenkins-gke" {
 }
 
 /*****************************************
-  IAM Bindings GKE SVC
- *****************************************/
-# allow GKE to pull images from GCR
-resource "google_project_iam_member" "gke" {
-  project = data.google_client_config.default.project
-  role    = "roles/storage.objectViewer"
-
-  member = "serviceAccount:${module.jenkins-gke.service_account}"
-}
-
-/*****************************************
   Jenkins Workload Identity
  *****************************************/
 module "workload_identity" {
@@ -135,30 +125,6 @@ module "workload_identity" {
   name                = "jenkins-wi-${module.jenkins-gke.name}"
   namespace           = "default"
   use_existing_k8s_sa = false
-}
-
-# enable GSA to add and delete pods for jenkins builders
-resource "google_project_iam_member" "cluster-dev" {
-  project = data.google_client_config.default.project
-  role    = "roles/container.developer"
-  member  = module.workload_identity.gcp_service_account_fqn
-}
-
-data "google_client_config" "default" { }
-
-/*****************************************
-  K8S secrets for configuring K8S executers
- *****************************************/
-resource "kubernetes_secret" "jenkins-secrets" {
-  metadata {
-    name = var.jenkins_k8s_config
-  }
-  data = {
-    project_id          = data.google_client_config.default.project
-    kubernetes_endpoint = "https://${module.jenkins-gke.endpoint}"
-    ca_certificate      = module.jenkins-gke.ca_certificate
-    jenkins_tf_ksa      = module.workload_identity.k8s_service_account_name
-  }
 }
 
 /*****************************************
@@ -176,6 +142,39 @@ resource "kubernetes_secret" "gh-secrets" {
 }
 
 /*****************************************
+  K8S secrets for configuring K8S executers
+ *****************************************/
+resource "kubernetes_secret" "jenkins-secrets" {
+  metadata {
+    name = var.jenkins_k8s_config
+  }
+  data = {
+    project_id          = data.google_client_config.default.project
+    kubernetes_endpoint = "https://${module.jenkins-gke.endpoint}"
+    ca_certificate      = module.jenkins-gke.ca_certificate
+    jenkins_tf_ksa      = module.workload_identity.k8s_service_account_name
+  }
+}
+
+/*****************************************
+  IAM Bindings GKE SVC
+ *****************************************/
+# allow GKE to pull images from GCR
+resource "google_project_iam_member" "gke" {
+  project = data.google_client_config.default.project
+  role    = "roles/storage.objectViewer"
+
+  member = "serviceAccount:${module.jenkins-gke.service_account}"
+}
+
+# enable GSA to add and delete pods for jenkins builders
+resource "google_project_iam_member" "cluster-dev" {
+  project = data.google_client_config.default.project
+  role    = "roles/container.developer"
+  member  = module.workload_identity.gcp_service_account_fqn
+}
+
+/*****************************************
   Grant Jenkins SA Permissions to store
   TF state for Jenkins Pipelines
  *****************************************/
@@ -185,50 +184,27 @@ resource "google_storage_bucket_iam_member" "tf-state-writer" {
   member = module.workload_identity.gcp_service_account_fqn
 }
 
-#####--zone=${element(jsonencode(var.zones), 0)}" 
-# resource "null_resource" "get-credentials" {
-#  depends_on = [module.jenkins-gke.name] 
-#  provisioner "local-exec" {   
-#    command = "gcloud container clusters get-credentials ${module.jenkins-gke.name} --zone=${var.region}"
-#   }
-# }
-
 /*****************************************
   Grant Jenkins SA Permissions project editor
  *****************************************/
-  # resource "google_project_iam_member" "jenkins-project" {
-  #   project = data.google_client_config.default.project
-  #   role    = "roles/editor"
-  #   member = module.workload_identity.gcp_service_account_fqn
-  # }
+  resource "google_project_iam_member" "jenkins-project" {
+    project = data.google_client_config.default.project
+    role    = "roles/editor"
+    member = module.workload_identity.gcp_service_account_fqn
+  }
 
-  # data "local_file" "helm_chart_values" {
-  #   filename = "${path.module}/values.yaml"
-  # }
-  # resource "helm_release" "jenkins" {
-  #   name       = "jenkins"
-  #   repository = "https://charts.jenkins.io"
-  #   chart      = "jenkins"
-  #   #version   = "3.3.10"
-  #   timeout    = 1200
-  #   values     = [data.local_file.helm_chart_values.content]
-  #   depends_on = [
-  #     kubernetes_secret.gh-secrets, 
-  #     null_resource.get-credentials,
-  #   ]
-  # }
-
-# #Anthos - Make this Anthos Cluster
+#Anthos - Make GKE Anthos Cluster
 # module "hub" {
 # source           = "terraform-google-modules/kubernetes-engine/google//modules/hub"
 
-#   project_id       = data.google_client_config.default.project
-#   cluster_name     = var.clusname
-#   location         = module.jenkins-gke.location
-#   cluster_endpoint = module.jenkins-gke.endpoint
-#   gke_hub_membership_name = "primary"
-#   gke_hub_sa_name         = "primary"
-#   #depends_on            = [helm_release.jenkins]
+#   project_id                        = data.google_client_config.default.project
+#   cluster_name                      = var.clusname
+#   location                          = module.jenkins-gke.location
+#   cluster_endpoint                  = module.jenkins-gke.endpoint
+#   gke_hub_membership_name           = "primary"
+#   #gke_hub_sa_name                   = "primary"
+#   use_tf_google_credentials_env_var = true
+#   #depends_on                       = [helm_release.jenkins]
 # }
 
 # module "asm" {
@@ -255,3 +231,26 @@ resource "google_storage_bucket_iam_member" "tf-state-writer" {
 #   policy_dir       = "foo-corp"
 # }
 
+#####--zone=${element(jsonencode(var.zones), 0)}" 
+# resource "null_resource" "get-credentials" {
+#  depends_on = [module.jenkins-gke.name] 
+#  provisioner "local-exec" {   
+#    command = "gcloud container clusters get-credentials ${module.jenkins-gke.name} --zone=${var.region}"
+#   }
+# }
+
+  # data "local_file" "helm_chart_values" {
+  #   filename = "${path.module}/values.yaml"
+  # }
+  # resource "helm_release" "jenkins" {
+  #   name       = "jenkins"
+  #   repository = "https://charts.jenkins.io"
+  #   chart      = "jenkins"
+  #   #version   = "3.3.10"
+  #   timeout    = 1200
+  #   values     = [data.local_file.helm_chart_values.content]
+  #   depends_on = [
+  #     kubernetes_secret.gh-secrets, 
+  #     null_resource.get-credentials,
+  #   ]
+  # }
