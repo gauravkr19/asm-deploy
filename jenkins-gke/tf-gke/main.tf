@@ -204,7 +204,11 @@ resource "google_storage_bucket_iam_member" "tf-state-writer" {
    gke_hub_membership_name           = "primary"
    #gke_hub_sa_name                   = "primary"
    #use_tf_google_credentials_env_var = true
-   #depends_on                       = [helm_release.jenkins]
+   depends_on = [
+      google_project_iam_member.gke,
+      google_project_iam_member.cluster-dev,
+      google_project_iam_member.jenkins-project,
+    ]
  }
 
  module "asm" {
@@ -215,6 +219,11 @@ resource "google_storage_bucket_iam_member" "tf-state-writer" {
    location         = module.jenkins-gke.location
    cluster_endpoint = module.jenkins-gke.endpoint
    #asm_dir          = "asm-dir-\${module.jenkins-gke.name}"
+   depends_on = [
+      google_project_iam_member.gke,
+      google_project_iam_member.cluster-dev,
+      google_project_iam_member.jenkins-project,
+    ]
  }
 
 
@@ -229,6 +238,11 @@ resource "google_storage_bucket_iam_member" "tf-state-writer" {
    sync_repo        = "git@github.com:GoogleCloudPlatform/csp-config-management.git"
    sync_branch      = "1.0.0"
    policy_dir       = "foo-corp"
+   depends_on = [
+      google_project_iam_member.gke,
+      google_project_iam_member.cluster-dev,
+      google_project_iam_member.jenkins-project,
+    ]
  }
 
 #####--zone=${element(jsonencode(var.zones), 0)}" 
