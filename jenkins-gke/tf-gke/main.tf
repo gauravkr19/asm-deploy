@@ -194,18 +194,18 @@ resource "google_storage_bucket_iam_member" "tf-state-writer" {
   }
 
 #Anthos - Make GKE Anthos Cluster
-# module "hub" {
-# source           = "terraform-google-modules/kubernetes-engine/google//modules/hub"
+ module "hub" {
+ source           = "terraform-google-modules/kubernetes-engine/google//modules/hub"
 
-#   project_id                        = data.google_client_config.default.project
-#   cluster_name                      = var.clusname
-#   location                          = module.jenkins-gke.location
-#   cluster_endpoint                  = module.jenkins-gke.endpoint
-#   gke_hub_membership_name           = "primary"
-#   #gke_hub_sa_name                   = "primary"
-#   use_tf_google_credentials_env_var = true
-#   #depends_on                       = [helm_release.jenkins]
-# }
+   project_id                        = data.google_client_config.default.project
+   cluster_name                      = var.clusname
+   location                          = module.jenkins-gke.location
+   cluster_endpoint                  = module.jenkins-gke.endpoint
+   gke_hub_membership_name           = "primary"
+   #gke_hub_sa_name                   = "primary"
+   use_tf_google_credentials_env_var = true
+   #depends_on                       = [helm_release.jenkins]
+ }
 
 # module "asm" {
 #   source           = "terraform-google-modules/kubernetes-engine/google//modules/asm"
