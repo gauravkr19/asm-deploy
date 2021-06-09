@@ -204,11 +204,7 @@ resource "google_storage_bucket_iam_member" "tf-state-writer" {
    gke_hub_membership_name           = "primary"
    #gke_hub_sa_name                   = "primary"
    #use_tf_google_credentials_env_var = true
-   module_depends_on = [
-      google_project_iam_member.gke,
-      google_project_iam_member.cluster-dev,
-      google_project_iam_member.jenkins-project,
-    ]
+   module_depends_on = var.module_depends_on
  }
 
  module "asm" {
