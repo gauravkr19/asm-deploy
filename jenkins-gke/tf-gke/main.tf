@@ -103,8 +103,8 @@ module "jenkins-gke" {
       name               = "butler-pool"
       #node_count         = 2
       #node_locations     = "us-central1-b,us-central1-c"
-      min_count          = 3
-      max_count          = 4
+      min_count          = 2
+      max_count          = 3
       preemptible        = true
       machine_type       = "n2-standard-4"
       disk_size_gb       = 50
