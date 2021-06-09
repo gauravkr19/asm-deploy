@@ -219,11 +219,6 @@ resource "google_storage_bucket_iam_member" "tf-state-writer" {
    location         = module.jenkins-gke.location
    cluster_endpoint = module.jenkins-gke.endpoint
    #asm_dir          = "asm-dir-\${module.jenkins-gke.name}"
-   module_depends_on = [
-      google_project_iam_member.gke,
-      google_project_iam_member.cluster-dev,
-      google_project_iam_member.jenkins-project,
-    ]
  }
 
 
@@ -238,11 +233,6 @@ resource "google_storage_bucket_iam_member" "tf-state-writer" {
    sync_repo        = "git@github.com:GoogleCloudPlatform/csp-config-management.git"
    sync_branch      = "1.0.0"
    policy_dir       = "foo-corp"
-   module_depends_on = [
-      google_project_iam_member.gke,
-      google_project_iam_member.cluster-dev,
-      google_project_iam_member.jenkins-project,
-    ]
 }
 
 #####--zone=${element(jsonencode(var.zones), 0)}" 
