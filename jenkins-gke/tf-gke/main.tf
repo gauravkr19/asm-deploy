@@ -203,7 +203,7 @@ resource "google_storage_bucket_iam_member" "tf-state-writer" {
    cluster_endpoint                  = module.jenkins-gke.endpoint
    gke_hub_membership_name           = "primary"
    #gke_hub_sa_name                   = "primary"
-   use_tf_google_credentials_env_var = true
+   #use_tf_google_credentials_env_var = true
    #depends_on                       = [helm_release.jenkins]
  }
 
