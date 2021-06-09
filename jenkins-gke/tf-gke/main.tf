@@ -207,29 +207,29 @@ resource "google_storage_bucket_iam_member" "tf-state-writer" {
    #depends_on                       = [helm_release.jenkins]
  }
 
-# module "asm" {
-#   source           = "terraform-google-modules/kubernetes-engine/google//modules/asm"
+ module "asm" {
+   source           = "terraform-google-modules/kubernetes-engine/google//modules/asm"
 
-#   project_id       = data.google_client_config.default.project
-#   cluster_name     = var.clusname
-#   location         = module.jenkins-gke.location
-#   cluster_endpoint = module.jenkins-gke.endpoint
-#   asm_dir          = "asm-dir-${module.jenkins-gke.name}"
-# }
+   project_id       = data.google_client_config.default.project
+   cluster_name     = var.clusname
+   location         = module.jenkins-gke.location
+   cluster_endpoint = module.jenkins-gke.endpoint
+   asm_dir          = "asm-dir-${module.jenkins-gke.name}"
+ }
 
 
-# module "acm" {
-# source           = "terraform-google-modules/kubernetes-engine/google//modules/acm"
+ module "acm" {
+ source           = "terraform-google-modules/kubernetes-engine/google//modules/acm"
 
-#   project_id       = data.google_client_config.default.project
-#   cluster_name     = var.clusname
-#   location         = module.jenkins-gke.location
-#   cluster_endpoint = module.jenkins-gke.endpoint
+   project_id       = data.google_client_config.default.project
+   cluster_name     = var.clusname
+   location         = module.jenkins-gke.location
+   cluster_endpoint = module.jenkins-gke.endpoint
 
-#   sync_repo        = "git@github.com:GoogleCloudPlatform/csp-config-management.git"
-#   sync_branch      = "1.0.0"
-#   policy_dir       = "foo-corp"
-# }
+   sync_repo        = "git@github.com:GoogleCloudPlatform/csp-config-management.git"
+   sync_branch      = "1.0.0"
+   policy_dir       = "foo-corp"
+ }
 
 #####--zone=${element(jsonencode(var.zones), 0)}" 
 # resource "null_resource" "get-credentials" {
