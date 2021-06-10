@@ -1,22 +1,3 @@
-/*
-gcloud services enable \
-iam.googleapis.com \
-cloudresourcemanager.googleapis.com \
-compute.googleapis.com \
-containerregistry.googleapis.com \
-container.googleapis.com \
-storage-component.googleapis.com \
-logging.googleapis.com \
-monitoring.googleapis.com \
-serviceusage.googleapis.com \
-meshca.googleapis.com \
-stackdriver.googleapis.com \
-meshconfig.googleapis.com \
-meshtelemetry.googleapis.com \
-cloudtrace.googleapis.com 
-gcurl "https://serviceusage.googleapis.com/v1/projects/${PROJECT_NUMBER}/services?filter=state:DISABLED"
-*/
-
 /*****************************************
   Activate Services in Jenkins Project
  *****************************************/
@@ -122,7 +103,7 @@ module "jenkins-gke" {
       min_count          = 2
       max_count          = 3
       preemptible        = true
-      machine_type       = "n2-standard-4"
+      machine_type       = "n1-standard-2"
       disk_size_gb       = 50
       disk_type          = "pd-standard"
       image_type         = "COS"
@@ -210,42 +191,42 @@ resource "google_storage_bucket_iam_member" "tf-state-writer" {
   }
 
 #Anthos - Make GKE Anthos Cluster
- module "hub" {
- source           = "terraform-google-modules/kubernetes-engine/google//modules/hub"
+#  module "hub" {
+#  source           = "terraform-google-modules/kubernetes-engine/google//modules/hub"
 
-   project_id                        = data.google_client_config.default.project
-   cluster_name                      = var.clusname
-   location                          = module.jenkins-gke.location
-   cluster_endpoint                  = module.jenkins-gke.endpoint
-   gke_hub_membership_name           = "primary"
-   #gke_hub_sa_name                   = "primary"
-   #use_tf_google_credentials_env_var = true
-   module_depends_on = var.module_depends_on
- }
+#    project_id                        = data.google_client_config.default.project
+#    cluster_name                      = var.clusname
+#    location                          = module.jenkins-gke.location
+#    cluster_endpoint                  = module.jenkins-gke.endpoint
+#    gke_hub_membership_name           = "primary"
+#    #gke_hub_sa_name                   = "primary"
+#    #use_tf_google_credentials_env_var = true
+#    module_depends_on = var.module_depends_on
+#  }
 
- module "asm" {
-   source           = "terraform-google-modules/kubernetes-engine/google//modules/asm"
+#  module "asm" {
+#    source           = "terraform-google-modules/kubernetes-engine/google//modules/asm"
 
-   project_id       = data.google_client_config.default.project
-   cluster_name     = var.clusname
-   location         = module.jenkins-gke.location
-   cluster_endpoint = module.jenkins-gke.endpoint
-   #asm_dir          = "asm-dir-\${module.jenkins-gke.name}"
- }
+#    project_id       = data.google_client_config.default.project
+#    cluster_name     = var.clusname
+#    location         = module.jenkins-gke.location
+#    cluster_endpoint = module.jenkins-gke.endpoint
+#    #asm_dir          = "asm-dir-\${module.jenkins-gke.name}"
+#  }
 
 
- module "acm" {
- source           = "terraform-google-modules/kubernetes-engine/google//modules/acm"
+#  module "acm" {
+#  source           = "terraform-google-modules/kubernetes-engine/google//modules/acm"
 
-   project_id       = data.google_client_config.default.project
-   cluster_name     = var.clusname
-   location         = module.jenkins-gke.location
-   cluster_endpoint = module.jenkins-gke.endpoint
+#    project_id       = data.google_client_config.default.project
+#    cluster_name     = var.clusname
+#    location         = module.jenkins-gke.location
+#    cluster_endpoint = module.jenkins-gke.endpoint
 
-   sync_repo        = "git@github.com:GoogleCloudPlatform/csp-config-management.git"
-   sync_branch      = "1.0.0"
-   policy_dir       = "foo-corp"
-}
+#    sync_repo        = "git@github.com:GoogleCloudPlatform/csp-config-management.git"
+#    sync_branch      = "1.0.0"
+#    policy_dir       = "foo-corp"
+# }
 
 #####--zone=${element(jsonencode(var.zones), 0)}" 
  resource "null_resource" "get-credentials" {
