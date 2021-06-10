@@ -54,21 +54,21 @@ data "google_project" "project" {
   project_id = var.project_id
 }
 
-resource "kubernetes_cluster_role_binding" "user" {
-  metadata {
-    name = "terraform-example"
-  }
-  role_ref {
-    api_group = "rbac.authorization.k8s.io"
-    kind      = "ClusterRole"
-    name      = "cluster-admin"
-  }
-  subject {
-    kind      = "User"
-    name      = "${var.currentuser}"
-    api_group = "rbac.authorization.k8s.io"
-  }
-}
+# resource "kubernetes_cluster_role_binding" "user" {
+#   metadata {
+#     name = "terraform-example"
+#   }
+#   role_ref {
+#     api_group = "rbac.authorization.k8s.io"
+#     kind      = "ClusterRole"
+#     name      = "cluster-admin"
+#   }
+#   subject {
+#     kind      = "User"
+#     name      = "${var.currentuser}"
+#     api_group = "rbac.authorization.k8s.io"
+#   }
+# }
 
 /*****************************************
   Jenkins GKE
@@ -191,12 +191,12 @@ resource "google_storage_bucket_iam_member" "tf-state-writer" {
   }
 
 #####--zone=${element(jsonencode(var.zones), 0)}" 
- resource "null_resource" "get-credentials" {
-  #depends_on = [module.asm.cluster_name] 
-  provisioner "local-exec" {   
-    command = "gcloud container clusters get-credentials ${module.jenkins-gke.name} --zone=${var.region}"
-   }
- }
+#  resource "null_resource" "get-credentials" {
+#   #depends_on = [module.asm.cluster_name] 
+#   provisioner "local-exec" {   
+#     command = "gcloud container clusters get-credentials ${module.jenkins-gke.name} --zone=${var.region}"
+#    }
+#  }
 
 data "local_file" "helm_chart_values" {
   filename = "${path.module}/values.yaml"
@@ -210,6 +210,6 @@ resource "helm_release" "jenkins" {
   values     = [data.local_file.helm_chart_values.content]
   depends_on = [
     kubernetes_secret.gh-secrets, 
-    null_resource.get-credentials,
+    #null_resource.get-credentials,
   ]
 }
