@@ -14,6 +14,17 @@
  * limitations under the License.
  */
 
+variable "module_depends_on" {
+  default     = ["google_project_iam_member.gke", "google_project_iam_member.cluster-dev", "google_project_iam_member.jenkins-project", "kubernetes_cluster_role_binding.user"]
+  description = "Modules that are required to run before this module does"
+  type        = list
+}
+
+variable "currentuser" {
+  description = "Current-User"
+  type        = string
+}
+
 variable "project_id" {
   description = "The project id to deploy Jenkins on GKE"
 }
