@@ -1,5 +1,5 @@
-project_id               = "playground-s-11-cb7fa6d5"
-tfstate_gcs_backend      = "playground-s-11-cb7fa6d5-tfstate"
+project_id               = "playground-s-11-c837b984"
+tfstate_gcs_backend      = "playground-s-11-c837b984-tfstate"
 region                   = "us-central1"
 zones                    = ["us-central1-b"]
 jenkins_k8s_config       = "jenkins-k8s-config"
