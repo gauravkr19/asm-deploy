@@ -16,7 +16,7 @@
 
 terraform {
   backend "gcs" {
-    bucket = "playground-s-11-c837b984-tfstate"
+    bucket = "playground-s-11-cb7fa6d5-tfstate"
     prefix = "jenkins"
   }
 }
