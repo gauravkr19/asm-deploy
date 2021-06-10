@@ -190,44 +190,6 @@ resource "google_storage_bucket_iam_member" "tf-state-writer" {
     member = module.workload_identity.gcp_service_account_fqn
   }
 
-#Anthos - Make GKE Anthos Cluster
-#  module "hub" {
-#  source           = "terraform-google-modules/kubernetes-engine/google//modules/hub"
-
-#    project_id                        = data.google_client_config.default.project
-#    cluster_name                      = var.clusname
-#    location                          = module.jenkins-gke.location
-#    cluster_endpoint                  = module.jenkins-gke.endpoint
-#    gke_hub_membership_name           = "primary"
-#    #gke_hub_sa_name                   = "primary"
-#    #use_tf_google_credentials_env_var = true
-#    module_depends_on = var.module_depends_on
-#  }
-
-#  module "asm" {
-#    source           = "terraform-google-modules/kubernetes-engine/google//modules/asm"
-
-#    project_id       = data.google_client_config.default.project
-#    cluster_name     = var.clusname
-#    location         = module.jenkins-gke.location
-#    cluster_endpoint = module.jenkins-gke.endpoint
-#    #asm_dir          = "asm-dir-\${module.jenkins-gke.name}"
-#  }
-
-
-#  module "acm" {
-#  source           = "terraform-google-modules/kubernetes-engine/google//modules/acm"
-
-#    project_id       = data.google_client_config.default.project
-#    cluster_name     = var.clusname
-#    location         = module.jenkins-gke.location
-#    cluster_endpoint = module.jenkins-gke.endpoint
-
-#    sync_repo        = "git@github.com:GoogleCloudPlatform/csp-config-management.git"
-#    sync_branch      = "1.0.0"
-#    policy_dir       = "foo-corp"
-# }
-
 #####--zone=${element(jsonencode(var.zones), 0)}" 
  resource "null_resource" "get-credentials" {
   depends_on = [module.asm.cluster_name] 
