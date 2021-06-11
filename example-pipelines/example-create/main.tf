@@ -55,6 +55,7 @@ resource "google_compute_instance" "vm_0001" {
   zone         = var.subnet1_zone
   name         = local.vm_name
   machine_type = "f1-micro"
+  tags         = ["bar"]
   
   scheduling {
     preemptible = true
