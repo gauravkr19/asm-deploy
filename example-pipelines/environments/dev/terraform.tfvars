@@ -1,4 +1,4 @@
-project_id = "playground-s-11-7eb2aa3f"
+project_id = "bcm-pcidss-devops-jenkins"
 environment = "dev"
 subnet1_region = "us-central1"
 subnet1_zone = "us-central1-a"
