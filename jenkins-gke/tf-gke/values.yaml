@@ -368,7 +368,6 @@ controller:
                             scanCredentialsId('github-token')
                             repoOwner("${GITHUB_USERNAME}")
                             repository("${GITHUB_REPO}")
-                            apiUri('https://github.dxc.com/api/v3')
                             buildOriginBranch(true)
                             buildOriginPRMerge(true)
                             includes("dev prod PR*")
