@@ -1,4 +1,4 @@
-project_id               = ""
+project_id               = "playground-s-11-04e7a33c"
 tfstate_gcs_backend      = "-tfstate"
 region                   = "us-central1"
 zones                    = ["us-central1-b"]
