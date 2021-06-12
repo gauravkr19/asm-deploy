@@ -193,6 +193,7 @@ resource "google_project_iam_member" "gkeaccess" {
   project = data.google_client_config.default.project
   role    = "roles/gkehub.connect"
   member = "serviceAccount:${google_service_account.hubsa.name}"
+  depends_on = [google_service_account.hubsa]
 }
 
 resource "google_service_account" "hubsa" {
@@ -202,6 +203,7 @@ resource "google_service_account" "hubsa" {
 
 resource "google_service_account_key" "mykey" {
   service_account_id = google_service_account.hubsa.name
+  depends_on = [google_project_iam_member.gkeaccess]
 }
 
 resource "kubernetes_secret" "google-application-credentials" {
