@@ -189,17 +189,44 @@ resource "google_storage_bucket_iam_member" "tf-state-writer" {
     member = module.workload_identity.gcp_service_account_fqn
   }
 
- module "hub" {
- source           = "terraform-google-modules/kubernetes-engine/google//modules/hub"
+# Service Account to connect K8s clusters to GKE Hub
+module "service_accounts" {
+  source        = "terraform-google-modules/service-accounts/google"
+  version       = "~> 3.0"
+  project_id    = data.google_client_config.default.project
+  names         = [var.service_account_name]
+  description   = "Service Account to connect K8s clusters to GKE Hub"
+  generate_keys = "true"
+  project_roles = [
+    join("=>", [data.google_client_config.default.project, "roles/gkehub.connect"]),
+  ]
+}
 
-   project_id                        = data.google_client_config.default.project
-   cluster_name                      = var.clusname
-   location                          = module.jenkins-gke.location
-   cluster_endpoint                  = module.jenkins-gke.endpoint
-   gke_hub_membership_name           = "primary"
-   #gke_hub_sa_name                   = "primary"
-   module_depends_on                 = var.module_depends_on
- }
+#Anthos - Make GKE Anthos Cluster
+module "hub" {
+  source                  = "terraform-google-modules/kubernetes-engine/google//modules/hub"
+  project_id              = data.google_client_config.default.project
+  location                = module.jenkins-gke.location
+  cluster_name            = var.clusname
+  cluster_endpoint        = module.jenkins-gke.endpoint
+  gke_hub_membership_name = var.clusname
+  use_existing_sa         = true
+  gke_hub_sa_name         = var.service_account_name
+  sa_private_key          = base64encode(lookup(module.service_accounts.key, "rendered", ""))
+  module_depends_on       = var.module_depends_on
+}
+
+#  module "hub" {
+#  source           = "terraform-google-modules/kubernetes-engine/google//modules/hub"
+
+#    project_id                        = data.google_client_config.default.project
+#    cluster_name                      = var.clusname
+#    location                          = module.jenkins-gke.location
+#    cluster_endpoint                  = module.jenkins-gke.endpoint
+#    gke_hub_membership_name           = "primary"
+#    #gke_hub_sa_name                   = "primary"
+#    module_depends_on                 = var.module_depends_on
+#  }
 
 #####--zone=${element(jsonencode(var.zones), 0)}" 
 #  resource "null_resource" "get-credentials" {
