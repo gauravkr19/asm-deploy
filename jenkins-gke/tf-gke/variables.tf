@@ -93,6 +93,6 @@ variable clusname {
   description = "GKE cluster name"
 }
 
-# variable "service_account_name" {
-#   default = "jenkins-hub-sa"
-# }
+ variable "service_account_name" {
+   default = "jenkins-hub-sa"
+ }
