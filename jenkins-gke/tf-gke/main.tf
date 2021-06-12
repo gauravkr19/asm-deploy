@@ -189,6 +189,7 @@ resource "google_storage_bucket_iam_member" "tf-state-writer" {
     member = module.workload_identity.gcp_service_account_fqn
   }
 
+/*
  module "hub" {
  source           = "terraform-google-modules/kubernetes-engine/google//modules/hub"
 
@@ -200,6 +201,7 @@ resource "google_storage_bucket_iam_member" "tf-state-writer" {
    #gke_hub_sa_name                   = "primary"
    module_depends_on                 = var.module_depends_on
  }
+*/
 
 #####--zone=${element(jsonencode(var.zones), 0)}" 
 #  resource "null_resource" "get-credentials" {
