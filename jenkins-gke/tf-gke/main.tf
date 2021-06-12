@@ -21,7 +21,6 @@ module "project-services" {
     "gkehub.googleapis.com",
     "monitoring.googleapis.com",
     "logging.googleapis.com"
-
   ]
 }
 
@@ -100,8 +99,8 @@ module "jenkins-gke" {
       name               = "butler-pool"
       #node_count         = 2
       #node_locations     = "us-central1-b,us-central1-c"
-      min_count          = 2
-      max_count          = 3
+      min_count          = 4
+      max_count          = 4
       preemptible        = true
       machine_type       = "n1-standard-2"
       disk_size_gb       = 50
@@ -190,26 +189,38 @@ resource "google_storage_bucket_iam_member" "tf-state-writer" {
     member = module.workload_identity.gcp_service_account_fqn
   }
 
-#####--zone=${element(jsonencode(var.zones), 0)}" 
- resource "null_resource" "get-credentials" {
-  #depends_on = [module.jenkins-gke.name] 
-  provisioner "local-exec" {   
-    command = "gcloud container clusters get-credentials ${module.jenkins-gke.name} --zone=${var.region}"
-   }
+ module "hub" {
+ source           = "terraform-google-modules/kubernetes-engine/google//modules/hub"
+
+   project_id                        = data.google_client_config.default.project
+   cluster_name                      = var.clusname
+   location                          = module.jenkins-gke.location
+   cluster_endpoint                  = module.jenkins-gke.endpoint
+   gke_hub_membership_name           = "primary"
+   #gke_hub_sa_name                   = "primary"
+   module_depends_on                 = var.module_depends_on
  }
 
-data "local_file" "helm_chart_values" {
-  filename = "${path.module}/values.yaml"
-}
-resource "helm_release" "jenkins" {
-  name       = "jenkins"
-  repository = "https://charts.jenkins.io"
-  chart      = "jenkins"
-  #version   = "3.3.10"
-  timeout    = 1200
-  values     = [data.local_file.helm_chart_values.content]
-  depends_on = [
-    kubernetes_secret.gh-secrets, 
-    null_resource.get-credentials,
-  ]
-}
+#####--zone=${element(jsonencode(var.zones), 0)}" 
+#  resource "null_resource" "get-credentials" {
+#   #depends_on = [module.jenkins-gke.name] 
+#   provisioner "local-exec" {   
+#     command = "gcloud container clusters get-credentials ${module.jenkins-gke.name} --zone=${var.region}"
+#    }
+#  }
+
+# data "local_file" "helm_chart_values" {
+#   filename = "${path.module}/values.yaml"
+# }
+# resource "helm_release" "jenkins" {
+#   name       = "jenkins"
+#   repository = "https://charts.jenkins.io"
+#   chart      = "jenkins"
+#   #version   = "3.3.10"
+#   timeout    = 1200
+#   values     = [data.local_file.helm_chart_values.content]
+#   depends_on = [
+#     kubernetes_secret.gh-secrets, 
+#     null_resource.get-credentials,
+#   ]
+# }
