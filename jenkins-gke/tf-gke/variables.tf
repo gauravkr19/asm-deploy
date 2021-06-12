@@ -4,7 +4,7 @@ variable "module_depends_on" {
     "google_project_iam_member.cluster-dev", 
     "google_project_iam_member.jenkins-project", 
     "kubernetes_cluster_role_binding.user",
-    "module.workload_identity.name"
+    "module.workload_identity.name",
     "module.service_accounts.name"
     ]
   description = "Modules that are required to run before this module does"
