@@ -189,17 +189,29 @@ resource "google_storage_bucket_iam_member" "tf-state-writer" {
     member = module.workload_identity.gcp_service_account_fqn
   }
 
-# Service Account to connect K8s clusters to GKE Hub
-module "service_accounts" {
-  source        = "terraform-google-modules/service-accounts/google"
-  version       = "~> 3.0"
-  project_id    = data.google_client_config.default.project
-  names         = [var.service_account_name]
-  description   = "Service Account to connect K8s clusters to GKE Hub"
-  generate_keys = "true"
-  project_roles = [
-    join("=>", [data.google_client_config.default.project, "roles/gkehub.connect"]),
-  ]
+resource "google_project_iam_member" "gkeaccess" {
+  project = data.google_client_config.default.project
+  role    = "roles/gkehub.connect"
+  member = "serviceAccount:${google_service_account.hubsa.name}"
+}
+
+resource "google_service_account" "hubsa" {
+  account_id   = "hubsa"
+  display_name = "hub sa"
+}
+
+resource "google_service_account_key" "mykey" {
+  service_account_id = google_service_account.hubsa.name
+}
+
+resource "kubernetes_secret" "google-application-credentials" {
+  metadata {
+    name = "creds-gcp"
+	namespace = "gke-connect"
+  }
+  data = {
+    "creds-gcp.json" = base64decode(google_service_account_key.mykey.private_key)
+  }
 }
 
 #Anthos - Make GKE Anthos Cluster
