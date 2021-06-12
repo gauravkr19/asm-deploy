@@ -216,18 +216,6 @@ module "hub" {
   module_depends_on       = var.module_depends_on
 }
 
-#  module "hub" {
-#  source           = "terraform-google-modules/kubernetes-engine/google//modules/hub"
-
-#    project_id                        = data.google_client_config.default.project
-#    cluster_name                      = var.clusname
-#    location                          = module.jenkins-gke.location
-#    cluster_endpoint                  = module.jenkins-gke.endpoint
-#    gke_hub_membership_name           = "primary"
-#    #gke_hub_sa_name                   = "primary"
-#    module_depends_on                 = var.module_depends_on
-#  }
-
 #####--zone=${element(jsonencode(var.zones), 0)}" 
 #  resource "null_resource" "get-credentials" {
 #   #depends_on = [module.jenkins-gke.name] 
