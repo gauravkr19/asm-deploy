@@ -6,23 +6,3 @@ Jenkins Setup:
 
 --> Jenkinsfile has the pipeline logic to provision infra in the target env.
 
-Listing out some of the issues with the existing code.
-
-Issue-1: The Jenkins deployment makes use of deprecated Helm repo.
-
-Approach to resolve: We may have to update the Helm repo. However, we are facing issue in passing the env var to container pods which worked fine with deprecated Helm repo. We are looking into it to fix it.
-Also briefed Pavithra on this, and requested her in setting up Jenkins using the groovy pipeline code. She is looking into it. 
-
-Issue-2: Google Terraform Module 'modules/project_services', used in the repo, is NOT able to enable the Services.
-
-Approach to resolve: Haven't looked into, but can use the resource to enable the listed Services if the Module is not working.
-
-Issue-3: Update the Terraform version (for Host machine and Jenkins Pods); Using 0.12.24 now
-
-Approach to resolve: Latest version is 15.1; so will have to update to a stable Terraform version. This may also require some code update.
-
-Issue-4: Provisioning the infra from windows machine has some issue.
-
-Approach to resolve: This needs to be looked at too.
-
-
