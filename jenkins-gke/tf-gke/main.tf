@@ -196,7 +196,7 @@ resource "google_project_iam_member" "gkeaccess" {
 }
 
 resource "google_service_account" "hubsa" {
-  account_id   = "hubsa"
+  account_id   = "hub-service-account-id"
   display_name = "hub sa"
 }
 
@@ -213,7 +213,7 @@ resource "kubernetes_secret" "google-application-credentials" {
     "creds-gcp.json" = base64decode(google_service_account_key.mykey.private_key)
   }
 }
-
+/*
 #Anthos - Make GKE Anthos Cluster
 module "hub" {
   source                  = "terraform-google-modules/kubernetes-engine/google//modules/hub"
@@ -227,6 +227,7 @@ module "hub" {
 #  sa_private_key          = base64encode(lookup(tomap({module.service_accounts.key}), "rendered", ""))
   module_depends_on       = var.module_depends_on
 }
+*/
 
 #####--zone=${element(jsonencode(var.zones), 0)}" 
 #  resource "null_resource" "get-credentials" {
