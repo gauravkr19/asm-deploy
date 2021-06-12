@@ -212,7 +212,7 @@ module "hub" {
   gke_hub_membership_name = var.clusname
   use_existing_sa         = true
   gke_hub_sa_name         = var.service_account_name
-  sa_private_key          = base64encode(lookup(module.service_accounts.key, "rendered", ""))
+  sa_private_key          = base64encode(lookup(tomap({module.service_accounts.key}), "rendered", ""))
   module_depends_on       = var.module_depends_on
 }
 
