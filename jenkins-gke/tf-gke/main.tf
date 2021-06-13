@@ -194,6 +194,12 @@ resource "google_service_account" "hubsa" {
   display_name = "My Service Account"
 }
 
+  resource "google_project_iam_member" "hubaccess" {
+    project = data.google_client_config.default.project
+    role    = "roles/editor"
+    member  = "serviceAccount:${google_service_account.hubsa.email}"
+  }
+
 resource "google_service_account_key" "hubsa_credentials" {
   service_account_id = google_service_account.hubsa.name
   public_key_type    = "TYPE_X509_PEM_FILE"
@@ -212,6 +218,16 @@ module "hub" {
   gke_hub_sa_name         = google_service_account.hubsa.account_id
   sa_private_key          = google_service_account_key.hubsa_credentials.private_key
   module_depends_on       = var.module_depends_on
+}
+
+module "asm-jenkins" {
+  source           = "terraform-google-modules/kubernetes-engine/google//modules/asm"
+  version          = "13.0.0"
+  project_id       = data.google_client_config.default.project
+  cluster_name     = var.clusname
+  location         = module.jenkins-gke.location
+  cluster_endpoint = module.jenkins-gke.endpoint
+  asm_dir          = "asm-dir-${module.jenkins-gke.name}"
 }
 
 
