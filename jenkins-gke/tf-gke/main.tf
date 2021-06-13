@@ -189,33 +189,17 @@ resource "google_storage_bucket_iam_member" "tf-state-writer" {
     member = module.workload_identity.gcp_service_account_fqn
   }
 
-resource "google_project_iam_member" "gkeaccess" {
-  project = data.google_client_config.default.project
-  role    = "roles/gkehub.connect"
-  member = "serviceAccount:${google_service_account.hubsa.name}"
-  depends_on = [google_service_account.hubsa]
-}
-
 resource "google_service_account" "hubsa" {
-  account_id   = "hub-service-account-id"
-  display_name = "hub sa"
+  account_id   = "hub-svc-sa"
+  display_name = "My Service Account"
 }
 
-resource "google_service_account_key" "mykey" {
+resource "google_service_account_key" "hubsa_credentials" {
   service_account_id = google_service_account.hubsa.name
-  depends_on = [google_project_iam_member.gkeaccess]
+  public_key_type    = "TYPE_X509_PEM_FILE"
 }
 
-resource "kubernetes_secret" "google-application-credentials" {
-  metadata {
-    name = "creds-gcp"
-	namespace = "gke-connect"
-  }
-  data = {
-    "creds-gcp.json" = base64decode(google_service_account_key.mykey.private_key)
-  }
-}
-/*
+
 #Anthos - Make GKE Anthos Cluster
 module "hub" {
   source                  = "terraform-google-modules/kubernetes-engine/google//modules/hub"
@@ -224,12 +208,12 @@ module "hub" {
   cluster_name            = var.clusname
   cluster_endpoint        = module.jenkins-gke.endpoint
   gke_hub_membership_name = var.clusname
-#  use_existing_sa         = true
-#  gke_hub_sa_name         = var.service_account_name
-#  sa_private_key          = base64encode(lookup(tomap({module.service_accounts.key}), "rendered", ""))
+  use_existing_sa         = true
+  gke_hub_sa_name         = google_service_account.hubsa.account_id
+  sa_private_key          = google_service_account_key.hubsa_credentials.private_key
   module_depends_on       = var.module_depends_on
 }
-*/
+
 
 #####--zone=${element(jsonencode(var.zones), 0)}" 
 #  resource "null_resource" "get-credentials" {
