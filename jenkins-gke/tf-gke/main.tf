@@ -252,7 +252,7 @@ module "acm-jenkins" {
    }
  }
 
-resource "local_file" "helm_chart_values" {
+data "local_file" "helm_chart_values" {
   filename = "${path.module}/values.yaml"
 }
 resource "helm_release" "jenkins" {
@@ -260,11 +260,11 @@ resource "helm_release" "jenkins" {
   repository = "https://charts.jenkins.io"
   chart      = "jenkins"
   #version   = "3.3.10"
-  timeout    = 1200
+  timeout    = 600
   values     = [local_file.helm_chart_values.content]
   depends_on = [
     kubernetes_secret.gh-secrets, 
     null_resource.get-credentials,
-    local_file.helm_chart_values,
+    data.local_file.helm_chart_values,
   ]
 }
