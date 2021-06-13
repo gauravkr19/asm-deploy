@@ -228,6 +228,7 @@ module "asm-jenkins" {
   location         = module.jenkins-gke.location
   cluster_endpoint = module.jenkins-gke.endpoint
   asm_dir          = "asm-dir-${module.jenkins-gke.name}"
+  depends_on       = [module.hub.wait]
 }
 
 module "acm-jenkins" {
@@ -242,6 +243,7 @@ module "acm-jenkins" {
   sync_repo        = var.acm_repo_location
   sync_branch      = var.acm_branch
   policy_dir       = var.acm_dir
+  depends_on       = [module.hub.wait]
 }
 
 #####--zone=${element(jsonencode(var.zones), 0)}" 
