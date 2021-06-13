@@ -230,6 +230,19 @@ module "asm-jenkins" {
   asm_dir          = "asm-dir-${module.jenkins-gke.name}"
 }
 
+module "acm-jenkins" {
+  source           = "github.com/terraform-google-modules/terraform-google-kubernetes-engine//modules/acm"
+
+  project_id       = data.google_client_config.default.project
+  cluster_name     = var.clusname
+  location         = module.jenkins-gke.location
+  cluster_endpoint = module.jenkins-gke.endpoint
+
+  operator_path    = "config-management-operator.yaml"
+  sync_repo        = var.acm_repo_location
+  sync_branch      = var.acm_branch
+  policy_dir       = var.acm_dir
+}
 
 #####--zone=${element(jsonencode(var.zones), 0)}" 
 #  resource "null_resource" "get-credentials" {
