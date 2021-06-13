@@ -265,6 +265,6 @@ resource "helm_release" "jenkins" {
   depends_on = [
     kubernetes_secret.gh-secrets, 
     null_resource.get-credentials,
-    local_file.helm_chart_values,
+    data.local_file.helm_chart_values,
   ]
 }
