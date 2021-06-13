@@ -261,7 +261,7 @@ resource "helm_release" "jenkins" {
   chart      = "jenkins"
   #version   = "3.3.10"
   timeout    = 600
-  values     = [local_file.helm_chart_values.content]
+  values     = [data.local_file.helm_chart_values.content]
   depends_on = [
     kubernetes_secret.gh-secrets, 
     null_resource.get-credentials,
