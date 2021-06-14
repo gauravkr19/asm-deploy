@@ -257,26 +257,28 @@ resource "null_resource" "wait" {
 }
 
 #####--zone=${element(jsonencode(var.zones), 0)}" 
-#  resource "null_resource" "get-credentials" {
-#   depends_on = [module.asm-jenkins.cluster_name] 
-#   provisioner "local-exec" {   
-#     command = "gcloud container clusters get-credentials ${module.jenkins-gke.name} --zone=${var.region}"
-#    }
-#  }
+ resource "null_resource" "get-credentials" {
+  depends_on = [module.asm-jenkins.cluster_name] 
+  provisioner "local-exec" {   
+    command = "gcloud container clusters get-credentials ${module.jenkins-gke.name} --zone=${var.region}"
+   }
+ }
 
-# data "local_file" "helm_chart_values" {
-#   filename = "${path.module}/values.yaml"
-# }
-# resource "helm_release" "jenkins" {
-#   name       = "jenkins"
-#   repository = "https://charts.jenkins.io"
-#   chart      = "jenkins"
-#   #version   = "3.3.10"
-#   timeout    = 600
-#   values     = [data.local_file.helm_chart_values.content]
-#   depends_on = [
-#     kubernetes_secret.gh-secrets, 
-#     null_resource.get-credentials,
-#     data.local_file.helm_chart_values,
-#   ]
-# }
+data "local_file" "helm_chart_values" {
+  filename = "${path.module}/values.yaml"
+}
+resource "helm_release" "jenkins" {
+  name       = "jenkins"
+  repository = "https://charts.jenkins.io"
+  chart      = "jenkins"
+  #version   = "3.3.10"
+  timeout    = 600
+  values     = [data.local_file.helm_chart_values.content]
+  depends_on = [
+    kubernetes_secret.gh-secrets, 
+    null_resource.get-credentials,
+    data.local_file.helm_chart_values,
+    module.acm-jenkins.cluster_name,
+    module.asm-jenkins.cluster_name,
+  ]
+}
