@@ -228,6 +228,7 @@ module "asm-jenkins" {
   location         = module.jenkins-gke.location
   cluster_endpoint = module.jenkins-gke.endpoint
   asm_dir          = "asm-dir-${module.jenkins-gke.name}"
+  depends_on       = [module.hub.wait]
 }
 
 module "acm-jenkins" {
@@ -244,9 +245,9 @@ module "acm-jenkins" {
   policy_dir       = var.acm_dir
 }
 
-resource "null_resource" "wait" {
-  depends_on = [module.acm-jenkins.wait, module.asm-jenkins.asm_wait, module.hub.wait]
-}
+# resource "null_resource" "wait" {
+#   depends_on = [module.acm-jenkins.wait, module.asm-jenkins.asm_wait, module.hub.wait]
+# }
 
 #####--zone=${element(jsonencode(var.zones), 0)}" 
  resource "null_resource" "get-credentials" {
