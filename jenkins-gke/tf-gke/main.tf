@@ -235,6 +235,7 @@ module "asm-jenkins" {
   location         = module.jenkins-gke.location
   cluster_endpoint = module.jenkins-gke.endpoint
   asm_dir          = "asm-dir-${module.jenkins-gke.name}"
+  depends_on       = "module.hub.cluster_name"
 }
 
 module "acm-jenkins" {
