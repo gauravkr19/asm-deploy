@@ -115,7 +115,7 @@ module "jenkins-gke" {
   Jenkins Workload Identity
  *****************************************/
 module "workload_identity" {
-  source              = "terraform-google-modules/kubernetes-engine/google//modules/workload-identity"
+  source              = "github.com/terraform-google-modules/terraform-google-kubernetes-engine//modules/workload-identity"                        
   version             = "14.3.0"
   project_id          = data.google_client_config.default.project
   name                = "jenkins-wi-${module.jenkins-gke.name}"
@@ -220,12 +220,12 @@ module "hub" {
   module_depends_on       = var.module_depends_on
 }
 
-resource "null_resource" "previous" {}
+# resource "null_resource" "previous" {}
 
-resource "time_sleep" "wait_3m" {
-  depends_on = [null_resource.previous, module.hub.cluster_name]
-  create_duration = "3m"
-}
+# resource "time_sleep" "wait_3m" {
+#   depends_on = [null_resource.previous, module.hub.cluster_name]
+#   create_duration = "3m"
+# }
 
 module "asm-jenkins" {
   source           = "terraform-google-modules/kubernetes-engine/google//modules/asm"
@@ -251,9 +251,9 @@ module "acm-jenkins" {
   policy_dir       = var.acm_dir
 }
 
-# resource "null_resource" "wait" {
-#   depends_on = [module.acm-jenkins.wait, module.asm-jenkins.asm_wait, module.hub.wait]
-# }
+resource "null_resource" "wait" {
+  depends_on = [module.acm-jenkins.wait, module.asm-jenkins.asm_wait]
+}
 
 #####--zone=${element(jsonencode(var.zones), 0)}" 
 #  resource "null_resource" "get-credentials" {
