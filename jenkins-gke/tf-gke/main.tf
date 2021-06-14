@@ -221,7 +221,6 @@ module "hub" {
 }
 
 # resource "null_resource" "previous" {}
-
 # resource "time_sleep" "wait_3m" {
 #   depends_on = [null_resource.previous, module.hub.cluster_name]
 #   create_duration = "3m"
@@ -258,14 +257,17 @@ resource "null_resource" "wait" {
 
 #####--zone=${element(jsonencode(var.zones), 0)}" 
  resource "null_resource" "get-credentials" {
-  depends_on = [module.asm-jenkins.cluster_name] 
+  depends_on = [
+    module.asm-jenkins.cluster_name,
+    module.acm-jenkins.cluster_name,
+  ] 
   provisioner "local-exec" {   
     command = "gcloud container clusters get-credentials ${module.jenkins-gke.name} --zone=${var.region}"
    }
  }
 
 data "local_file" "helm_chart_values" {
-  filename = "${path.module}/values.yaml"
+  filename    = "${path.module}/values.yaml"
 }
 resource "helm_release" "jenkins" {
   name       = "jenkins"
