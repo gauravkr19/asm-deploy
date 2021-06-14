@@ -220,6 +220,13 @@ module "hub" {
   module_depends_on       = var.module_depends_on
 }
 
+resource "null_resource" "previous" {}
+
+resource "time_sleep" "wait_3m" {
+  depends_on = [null_resource.previous]
+  create_duration = "3m"
+}
+
 module "asm-jenkins" {
   source           = "terraform-google-modules/kubernetes-engine/google//modules/asm"
   version          = "13.0.0"
@@ -228,7 +235,7 @@ module "asm-jenkins" {
   location         = module.jenkins-gke.location
   cluster_endpoint = module.jenkins-gke.endpoint
   asm_dir          = "asm-dir-${module.jenkins-gke.name}"
-  depends_on       = [module.hub.wait]
+  depends_on       = [time_sleep.wait_3m]
 }
 
 module "acm-jenkins" {
