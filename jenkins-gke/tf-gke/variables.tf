@@ -6,7 +6,8 @@ variable "module_depends_on" {
     "module.workload_identity.name",
     "google_service_account.hubsa",
     "google_project_iam_member.hubaccess",
-    "google_service_account_key.hubsa_credentials"
+    "google_service_account_key.hubsa_credentials",
+    "module.jenkins-gk.name"
     ]
   description = "Modules that are required to run before this module does"
   type        = list

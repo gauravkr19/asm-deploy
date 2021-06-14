@@ -102,7 +102,7 @@ module "jenkins-gke" {
       min_count          = 2
       max_count          = 2
       preemptible        = true
-      machine_type       = "n1-standard-4"
+      machine_type       = "custom-4-8"
       disk_size_gb       = 50
       disk_type          = "pd-standard"
       image_type         = "COS"
