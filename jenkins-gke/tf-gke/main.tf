@@ -99,10 +99,10 @@ module "jenkins-gke" {
       name               = "butler-pool"
       #node_count         = 2
       #node_locations     = "us-central1-b,us-central1-c"
-      min_count          = 2
-      max_count          = 2
+      min_count          = 4
+      max_count          = 4
       preemptible        = true
-      machine_type       = "n1-standard-4"
+      machine_type       = "n1-standard-2"
       disk_size_gb       = 50
       disk_type          = "pd-standard"
       image_type         = "COS"
@@ -251,7 +251,7 @@ module "acm-jenkins" {
 
 #####--zone=${element(jsonencode(var.zones), 0)}" 
  resource "null_resource" "get-credentials" {
-  #depends_on = [module.jenkins-gke.name] 
+  depends_on = [module.asm-jenkins.cluster_name] 
   provisioner "local-exec" {   
     command = "gcloud container clusters get-credentials ${module.jenkins-gke.name} --zone=${var.region}"
    }
