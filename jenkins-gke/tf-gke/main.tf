@@ -285,3 +285,29 @@ resource "helm_release" "jenkins" {
     module.acm-jenkins.wait,
   ]
 }
+
+resource "kubernetes_namespace" "apps-ns" {
+  depends_on = [helm_release.jenkins]
+  metadata {
+
+    labels = {
+      "istio.io/rev" = "apps-ns"
+    }
+    name = "apps-ns"
+  }
+}
+
+resource "null_resource" "deployapps" {
+  provisioner "local-exec" {
+    command = "kubectl apply -n apps-ns -f https://raw.githubusercontent.com/istio/istio/master/samples/bookinfo/platform/kube/bookinfo.yaml"
+  }
+  depends_on = [kubernetes_namespace.apps-ns]
+}
+
+resource "null_resource" "istio-comp" {
+  provisioner "local-exec" {
+    command = "kubectl apply -n apps-ns -f https://raw.githubusercontent.com/istio/istio/master/samples/bookinfo/networking/bookinfo-gateway.yaml"
+  }
+  depends_on = [kubernetes_namespace.apps-ns, null_resource.deployapps,]
+}
+
