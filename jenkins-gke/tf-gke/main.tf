@@ -220,12 +220,6 @@ module "hub" {
   module_depends_on       = var.module_depends_on
 }
 
- resource "null_resource" "previous" {}
- resource "time_sleep" "wait_2m" {
-   depends_on = [null_resource.previous]
-   create_duration = "2m"
- }
-
 module "asm-jenkins" {
   source           = "terraform-google-modules/kubernetes-engine/google//modules/asm"
   version          = "13.0.0"
@@ -286,6 +280,13 @@ resource "helm_release" "jenkins" {
   ]
 }
 
+/*
+resource "null_resource" "previous" {}
+resource "time_sleep" "wait_2m" {
+  depends_on = [null_resource.previous]
+  create_duration = "2m"
+}
+
 resource "kubernetes_namespace" "apps-ns" {
   depends_on = [helm_release.jenkins]
   metadata {
@@ -310,3 +311,4 @@ resource "null_resource" "istio-comp" {
   }
   depends_on = [kubernetes_namespace.apps-ns, null_resource.deployapps, time_sleep.wait_2m,]
 }
+*/
