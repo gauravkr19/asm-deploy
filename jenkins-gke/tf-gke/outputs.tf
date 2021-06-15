@@ -74,4 +74,10 @@ output "project" {
 output "location" {
   value = module.jenkins-gke.location
 }
-  
+
+
+
+output wait {
+  value       = "module.hub.wait"
+}
+

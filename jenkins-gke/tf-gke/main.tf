@@ -21,7 +21,6 @@ module "project-services" {
     "gkehub.googleapis.com",
     "monitoring.googleapis.com",
     "logging.googleapis.com"
-
   ]
 }
 
@@ -100,8 +99,8 @@ module "jenkins-gke" {
       name               = "butler-pool"
       #node_count         = 2
       #node_locations     = "us-central1-b,us-central1-c"
-      min_count          = 2
-      max_count          = 3
+      min_count          = 4
+      max_count          = 4
       preemptible        = true
       machine_type       = "n1-standard-2"
       disk_size_gb       = 50
@@ -116,8 +115,8 @@ module "jenkins-gke" {
   Jenkins Workload Identity
  *****************************************/
 module "workload_identity" {
-  source              = "terraform-google-modules/kubernetes-engine/google//modules/workload-identity"
-  version             = "14.3.0"
+  source              = "github.com/terraform-google-modules/terraform-google-kubernetes-engine//modules/workload-identity"                        
+  #version             = "14.3.0"
   project_id          = data.google_client_config.default.project
   name                = "jenkins-wi-${module.jenkins-gke.name}"
   namespace           = "default"
@@ -190,26 +189,99 @@ resource "google_storage_bucket_iam_member" "tf-state-writer" {
     member = module.workload_identity.gcp_service_account_fqn
   }
 
-#####--zone=${element(jsonencode(var.zones), 0)}" 
+resource "google_service_account" "hubsa" {
+  account_id   = "hub-svc-sa"
+  display_name = "My Service Account"
+}
+
+  resource "google_project_iam_member" "hubaccess" {
+    project = data.google_client_config.default.project
+    role    = "roles/editor"
+    member  = "serviceAccount:${google_service_account.hubsa.email}"
+  }
+
+resource "google_service_account_key" "hubsa_credentials" {
+  service_account_id = google_service_account.hubsa.name
+  public_key_type    = "TYPE_X509_PEM_FILE"
+}
+
+
+#Anthos - Make GKE Anthos Cluster
+module "hub" {
+  source                  = "terraform-google-modules/kubernetes-engine/google//modules/hub"
+  project_id              = data.google_client_config.default.project
+  location                = module.jenkins-gke.location
+  cluster_name            = var.clusname
+  cluster_endpoint        = module.jenkins-gke.endpoint
+  gke_hub_membership_name = var.clusname
+  use_existing_sa         = true
+  gke_hub_sa_name         = google_service_account.hubsa.account_id
+  sa_private_key          = google_service_account_key.hubsa_credentials.private_key
+  module_depends_on       = var.module_depends_on
+}
+
+# resource "null_resource" "previous" {}
+# resource "time_sleep" "wait_2m" {
+#   depends_on = [null_resource.previous]
+#   create_duration = "2m"
+# }
+
+module "asm-jenkins" {
+  source           = "terraform-google-modules/kubernetes-engine/google//modules/asm"
+  version          = "13.0.0"
+  project_id       = data.google_client_config.default.project
+  cluster_name     = var.clusname
+  location         = module.jenkins-gke.location
+  cluster_endpoint = module.jenkins-gke.endpoint
+  asm_dir          = "asm-dir-${module.jenkins-gke.name}"
+  #depends_on       = [module.hub.sa_private_key]
+}
+
+module "acm-jenkins" {
+  source           = "github.com/terraform-google-modules/terraform-google-kubernetes-engine//modules/acm"
+
+  project_id       = data.google_client_config.default.project
+  cluster_name     = var.clusname
+  location         = module.jenkins-gke.location
+  cluster_endpoint = module.jenkins-gke.endpoint
+
+  operator_path    = "config-management-operator.yaml"
+  sync_repo        = var.acm_repo_location
+  sync_branch      = var.acm_branch
+  policy_dir       = var.acm_dir
+  #depends_on	     = [module.asm-jenkins.asm_dir]
+}
+
+resource "null_resource" "wait" {
+  depends_on = [module.acm-jenkins.wait, module.asm-jenkins.asm_wait]
+}
+
+####--zone=${element(jsonencode(var.zones), 0)}" 
  resource "null_resource" "get-credentials" {
-  #depends_on = [module.jenkins-gke.name] 
+  depends_on = [
+    module.asm-jenkins.asm_wait,
+    module.acm-jenkins.wait,
+  ] 
   provisioner "local-exec" {   
     command = "gcloud container clusters get-credentials ${module.jenkins-gke.name} --zone=${var.region}"
    }
  }
 
 data "local_file" "helm_chart_values" {
-  filename = "${path.module}/values.yaml"
+  filename    = "${path.module}/values.yaml"
 }
 resource "helm_release" "jenkins" {
   name       = "jenkins"
   repository = "https://charts.jenkins.io"
   chart      = "jenkins"
   #version   = "3.3.10"
-  timeout    = 1200
+  timeout    = 600
   values     = [data.local_file.helm_chart_values.content]
   depends_on = [
     kubernetes_secret.gh-secrets, 
     null_resource.get-credentials,
+    data.local_file.helm_chart_values,
+    module.asm-jenkins.asm_wait,
+    module.acm-jenkins.wait,
   ]
 }

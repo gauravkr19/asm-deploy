@@ -1,21 +1,14 @@
-/**
- * Copyright 2020 Google LLC
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 variable "module_depends_on" {
-  default     = ["google_project_iam_member.gke", "google_project_iam_member.cluster-dev", "google_project_iam_member.jenkins-project", "kubernetes_cluster_role_binding.user"]
+  default = [
+    "google_project_iam_member.gke", 
+    "google_project_iam_member.cluster-dev", 
+    "google_project_iam_member.jenkins-project", 
+    "module.workload_identity.name",
+    "google_service_account.hubsa",
+    "google_project_iam_member.hubaccess",
+    "google_service_account_key.hubsa_credentials",
+    "module.jenkins-gk.name"
+    ]
   description = "Modules that are required to run before this module does"
   type        = list
 }
@@ -100,4 +93,18 @@ variable "subnet_cidr" {
 variable clusname {
   default     = "jenkins-gke"
   description = "GKE cluster name"
+}
+
+ variable "service_account_name" {
+   default = "jenkins-hub-sa"
+ }
+
+variable "acm_repo_location" {
+  description = "The location of the git repo ACM will sync to"
+}
+variable "acm_branch" {
+  description = "The git branch ACM will sync to"
+}
+variable "acm_dir" {
+  description = "The directory in git ACM will sync to"
 }
