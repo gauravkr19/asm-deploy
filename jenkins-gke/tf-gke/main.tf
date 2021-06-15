@@ -220,11 +220,11 @@ module "hub" {
   module_depends_on       = var.module_depends_on
 }
 
-# resource "null_resource" "previous" {}
-# resource "time_sleep" "wait_2m" {
-#   depends_on = [null_resource.previous]
-#   create_duration = "2m"
-# }
+ resource "null_resource" "previous" {}
+ resource "time_sleep" "wait_2m" {
+   depends_on = [null_resource.previous]
+   create_duration = "2m"
+ }
 
 module "asm-jenkins" {
   source           = "terraform-google-modules/kubernetes-engine/google//modules/asm"
