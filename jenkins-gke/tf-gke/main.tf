@@ -220,11 +220,11 @@ module "hub" {
   module_depends_on       = var.module_depends_on
 }
 
-resource "null_resource" "previous" {}
-resource "time_sleep" "wait_2m" {
-  depends_on = [null_resource.previous]
-  create_duration = "2m"
-}
+# resource "null_resource" "previous" {}
+# resource "time_sleep" "wait_2m" {
+#   depends_on = [null_resource.previous]
+#   create_duration = "2m"
+# }
 
 module "asm-jenkins" {
   source           = "terraform-google-modules/kubernetes-engine/google//modules/asm"
@@ -234,7 +234,7 @@ module "asm-jenkins" {
   location         = module.jenkins-gke.location
   cluster_endpoint = module.jenkins-gke.endpoint
   asm_dir          = "asm-dir-${module.jenkins-gke.name}"
-  depends_on       = [module.hub.sa_private_key]
+  #depends_on       = [module.hub.sa_private_key]
 }
 
 module "acm-jenkins" {
@@ -249,7 +249,7 @@ module "acm-jenkins" {
   sync_repo        = var.acm_repo_location
   sync_branch      = var.acm_branch
   policy_dir       = var.acm_dir
-  depends_on	   = [module.asm-jenkins.asm_dir]
+  #depends_on	     = [module.asm-jenkins.asm_dir]
 }
 
 resource "null_resource" "wait" {
@@ -257,31 +257,31 @@ resource "null_resource" "wait" {
 }
 
 #####--zone=${element(jsonencode(var.zones), 0)}" 
- resource "null_resource" "get-credentials" {
-  depends_on = [
-    module.asm-jenkins.asm_wait,
-    module.acm-jenkins.wait,
-  ] 
-  provisioner "local-exec" {   
-    command = "gcloud container clusters get-credentials ${module.jenkins-gke.name} --zone=${var.region}"
-   }
- }
+#  resource "null_resource" "get-credentials" {
+#   depends_on = [
+#     module.asm-jenkins.asm_wait,
+#     module.acm-jenkins.wait,
+#   ] 
+#   provisioner "local-exec" {   
+#     command = "gcloud container clusters get-credentials ${module.jenkins-gke.name} --zone=${var.region}"
+#    }
+#  }
 
-data "local_file" "helm_chart_values" {
-  filename    = "${path.module}/values.yaml"
-}
-resource "helm_release" "jenkins" {
-  name       = "jenkins"
-  repository = "https://charts.jenkins.io"
-  chart      = "jenkins"
-  #version   = "3.3.10"
-  timeout    = 600
-  values     = [data.local_file.helm_chart_values.content]
-  depends_on = [
-    kubernetes_secret.gh-secrets, 
-    null_resource.get-credentials,
-    data.local_file.helm_chart_values,
-    module.asm-jenkins.asm_wait,
-    module.acm-jenkins.wait,
-  ]
-}
+# data "local_file" "helm_chart_values" {
+#   filename    = "${path.module}/values.yaml"
+# }
+# resource "helm_release" "jenkins" {
+#   name       = "jenkins"
+#   repository = "https://charts.jenkins.io"
+#   chart      = "jenkins"
+#   #version   = "3.3.10"
+#   timeout    = 600
+#   values     = [data.local_file.helm_chart_values.content]
+#   depends_on = [
+#     kubernetes_secret.gh-secrets, 
+#     null_resource.get-credentials,
+#     data.local_file.helm_chart_values,
+#     module.asm-jenkins.asm_wait,
+#     module.acm-jenkins.wait,
+#   ]
+# }
