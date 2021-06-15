@@ -234,7 +234,7 @@ module "asm-jenkins" {
   location         = module.jenkins-gke.location
   cluster_endpoint = module.jenkins-gke.endpoint
   asm_dir          = "asm-dir-${module.jenkins-gke.name}"
-  depends_on       = [module.hub.sa_private_key]
+  depends_on       = [module.hub.sa_private_key, time_sleep.wait_2m]
 }
 
 module "acm-jenkins" {
