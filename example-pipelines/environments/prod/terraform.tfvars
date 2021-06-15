@@ -1,4 +1,4 @@
-project_id = "playground-s-11-9804fbfe"
+project_id = "bcm-pcidss-devops-gaurav"
 environment = "prod"
 subnet1_region = "us-central1"
 subnet1_zone = "us-central1-a"
