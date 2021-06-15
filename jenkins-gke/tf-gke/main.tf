@@ -297,6 +297,7 @@ resource "kubernetes_namespace" "apps-ns" {
   }
 }
 
+/*
 resource "null_resource" "deployapps" {
   provisioner "local-exec" {
     command = "kubectl apply -n apps-ns -f https://raw.githubusercontent.com/istio/istio/master/samples/bookinfo/platform/kube/bookinfo.yaml"
@@ -308,6 +309,6 @@ resource "null_resource" "istio-comp" {
   provisioner "local-exec" {
     command = "kubectl apply -n apps-ns -f https://raw.githubusercontent.com/istio/istio/master/samples/bookinfo/networking/bookinfo-gateway.yaml"
   }
-  depends_on = [kubernetes_namespace.apps-ns, null_resource.deployapps,]
+  depends_on = [kubernetes_namespace.apps-ns, null_resource.deployapps, time_sleep.wait_2m,]
 }
-
+*/
