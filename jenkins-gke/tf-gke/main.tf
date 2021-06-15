@@ -99,10 +99,10 @@ module "jenkins-gke" {
       name               = "butler-pool"
       #node_count         = 2
       #node_locations     = "us-central1-b,us-central1-c"
-      min_count          = 2
-      max_count          = 2
+      min_count          = 4
+      max_count          = 4
       preemptible        = true
-      machine_type       = "custom-4-10240"
+      machine_type       = "n1-standard-2"
       disk_size_gb       = 50
       disk_type          = "pd-standard"
       image_type         = "COS"
@@ -220,11 +220,11 @@ module "hub" {
   module_depends_on       = var.module_depends_on
 }
 
-# resource "null_resource" "previous" {}
-# resource "time_sleep" "wait_3m" {
-#   depends_on = [null_resource.previous, module.hub.cluster_name]
-#   create_duration = "3m"
-# }
+resource "null_resource" "previous" {}
+resource "time_sleep" "wait_2m" {
+  depends_on = [null_resource.previous]
+  create_duration = "2m"
+}
 
 module "asm-jenkins" {
   source           = "terraform-google-modules/kubernetes-engine/google//modules/asm"
@@ -234,7 +234,7 @@ module "asm-jenkins" {
   location         = module.jenkins-gke.location
   cluster_endpoint = module.jenkins-gke.endpoint
   asm_dir          = "asm-dir-${module.jenkins-gke.name}"
-  depends_on       = [module.hub.cluster_name]
+  depends_on       = [module.hub.wait, time_sleep.wait_2m]
 }
 
 module "acm-jenkins" {
@@ -251,15 +251,15 @@ module "acm-jenkins" {
   policy_dir       = var.acm_dir
 }
 
-resource "null_resource" "wait" {
-  depends_on = [module.acm-jenkins.wait, module.asm-jenkins.asm_wait]
-}
+# resource "null_resource" "wait" {
+#   depends_on = [module.acm-jenkins.wait, module.asm-jenkins.asm_wait]
+# }
 
 #####--zone=${element(jsonencode(var.zones), 0)}" 
  resource "null_resource" "get-credentials" {
   depends_on = [
-    module.asm-jenkins.cluster_name,
-    module.acm-jenkins.cluster_name,
+    module.asm-jenkins.asm_wait,
+    module.acm-jenkins.wait,
   ] 
   provisioner "local-exec" {   
     command = "gcloud container clusters get-credentials ${module.jenkins-gke.name} --zone=${var.region}"
@@ -280,7 +280,7 @@ resource "helm_release" "jenkins" {
     kubernetes_secret.gh-secrets, 
     null_resource.get-credentials,
     data.local_file.helm_chart_values,
-    module.acm-jenkins.cluster_name,
-    module.asm-jenkins.cluster_name,
+    module.asm-jenkins.asm_wait,
+    module.acm-jenkins.wait,
   ]
 }
