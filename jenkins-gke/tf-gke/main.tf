@@ -226,7 +226,7 @@ module "hub" {
 #   create_duration = "2m"
 # }
 
- 
+/* 
 module "asm-jenkins" {
   source           = "terraform-google-modules/kubernetes-engine/google//modules/asm"
   version          = "13.0.0"
@@ -286,3 +286,4 @@ resource "helm_release" "jenkins" {
     module.acm-jenkins.wait,
   ]
 }
+*/
