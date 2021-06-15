@@ -3,7 +3,7 @@ variable "module_depends_on" {
     "google_project_iam_member.gke", 
     "google_project_iam_member.cluster-dev", 
     "google_project_iam_member.jenkins-project", 
-    "module.workload_identity.name",
+    "module.workload_identity.google_service_account_iam_member.main",
     "google_service_account.hubsa",
     "google_project_iam_member.hubaccess",
     "google_service_account_key.hubsa_credentials",
