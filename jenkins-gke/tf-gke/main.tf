@@ -74,7 +74,7 @@ data "google_project" "project" {
  *****************************************/
 module "jenkins-gke" {
   source                   = "terraform-google-modules/kubernetes-engine/google//modules/beta-public-cluster/"
-  version                  = "13.0.0"
+  #version                  = "13.0.0"
   project_id               = data.google_client_config.default.project
   name                     = var.clusname
   regional                 = true
@@ -205,6 +205,10 @@ resource "google_service_account_key" "hubsa_credentials" {
   public_key_type    = "TYPE_X509_PEM_FILE"
 }
 
+resource "local_file" "key" {
+  filename = "/home/gaurav_kumar/"
+  content  = "${base64decode(google_service_account_key.hubsa_credentials.private_key)}"
+}
 
 #Anthos - Make GKE Anthos Cluster
 module "hub" {
