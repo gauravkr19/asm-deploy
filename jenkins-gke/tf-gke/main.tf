@@ -74,7 +74,7 @@ data "google_project" "project" {
  *****************************************/
 module "jenkins-gke" {
   source                   = "terraform-google-modules/kubernetes-engine/google//modules/beta-public-cluster/"
-  #version                  = "13.0.0"
+  version                  = "13.0.0"
   project_id               = data.google_client_config.default.project
   name                     = var.clusname
   regional                 = true
