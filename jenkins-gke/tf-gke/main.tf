@@ -206,7 +206,7 @@ resource "google_service_account_key" "hubsa_credentials" {
 }
 
 resource "local_file" "key" {
-  filename = "/home/gaurav_kumar/"
+  filename = "/home/gaurav_kumar/output"
   content  = "${base64decode(google_service_account_key.hubsa_credentials.private_key)}"
 }
 
