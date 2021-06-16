@@ -107,6 +107,7 @@ module "jenkins-gke" {
       disk_type          = "pd-standard"
       image_type         = "COS"
       auto_repair        = true    
+      auto_upgrade       = true   
     }
   ]
 }
