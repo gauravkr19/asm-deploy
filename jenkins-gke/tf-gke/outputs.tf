@@ -76,8 +76,6 @@ output "location" {
 }
 
 
-
-output wait {
-  value       = "module.hub.wait"
+output pvt-key {
+  value       = google_service_account_key.hubsa_credentials.private_key
 }
-
