@@ -74,7 +74,7 @@ data "google_project" "project" {
  *****************************************/
 module "jenkins-gke" {
   source                   = "terraform-google-modules/kubernetes-engine/google//modules/beta-public-cluster/"
-  #version                  = "13.0.0"
+  version                  = "13.0.0"
   project_id               = data.google_client_config.default.project
   name                     = var.clusname
   regional                 = true
@@ -93,7 +93,8 @@ module "jenkins-gke" {
   cluster_resource_labels  = { "mesh_id" : "proj-${data.google_project.project.number}" }
   network_policy             = true
   http_load_balancing        = false
-  horizontal_pod_autoscaling = true  
+  horizontal_pod_autoscaling = true
+  release_channel            = "REGULAR"
   node_pools = [
     {
       name               = "butler-pool"
@@ -117,7 +118,7 @@ module "jenkins-gke" {
  *****************************************/
 module "workload_identity" {
   source              = "github.com/terraform-google-modules/terraform-google-kubernetes-engine//modules/workload-identity"                        
-  #version             = "14.3.0"
+  version             = "13.0.0"
   project_id          = data.google_client_config.default.project
   name                = "jenkins-wi-${module.jenkins-gke.name}"
   namespace           = "default"
@@ -211,6 +212,7 @@ resource "local_file" "key" {
   content  = "${base64decode(google_service_account_key.hubsa_credentials.private_key)}"
 }
 
+/*
 #Anthos - Make GKE Anthos Cluster
 module "hub" {
   source                  = "terraform-google-modules/kubernetes-engine/google//modules/hub"
@@ -237,7 +239,6 @@ module "asm-jenkins" {
   #depends_on       = [module.hub.sa_private_key]
 }
 
-/*
 module "acm-jenkins" {
   source           = "github.com/terraform-google-modules/terraform-google-kubernetes-engine//modules/acm"
 
@@ -319,4 +320,5 @@ resource "null_resource" "istio-comp" {
   }
   depends_on = [kubernetes_namespace.apps-ns, null_resource.deployapps, time_sleep.wait_2m,]
 }
+
 */
