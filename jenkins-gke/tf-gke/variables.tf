@@ -52,7 +52,7 @@ variable "github_token" {
 
 variable "github_repo" {
   description = "Github repo name."
-  default     = "tf-jenkins-pipeline"
+  default     = "terraform-jenkins-pipeline"
 }
 
 variable "network" {
