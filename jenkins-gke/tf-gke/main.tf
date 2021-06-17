@@ -222,7 +222,6 @@ module "hub" {
   module_depends_on       = var.module_depends_on
 }
 
-/*
 module "asm-jenkins" {
   source           = "terraform-google-modules/kubernetes-engine/google//modules/asm"
   version          = "13.0.0"
@@ -281,9 +280,9 @@ resource "helm_release" "jenkins" {
     module.asm-jenkins.asm_wait,
     module.acm-jenkins.wait,
   ]
-}
 
 
+/*
 resource "null_resource" "previous" {}
 resource "time_sleep" "wait_2m" {
   depends_on = [null_resource.previous]
