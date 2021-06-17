@@ -117,7 +117,7 @@ module "jenkins-gke" {
   Jenkins Workload Identity
  *****************************************/
 module "workload_identity" {
-  source              = "github.com/terraform-google-modules/terraform-google-kubernetes-engine//modules/workload-identity"                        
+  source              = "terraform-google-modules/kubernetes-engine/google//modules/workload-identity"
   version             = "13.0.0"
   project_id          = data.google_client_config.default.project
   name                = "jenkins-wi-${module.jenkins-gke.name}"
