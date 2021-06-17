@@ -280,9 +280,10 @@ resource "helm_release" "jenkins" {
     module.asm-jenkins.asm_wait,
     module.acm-jenkins.wait,
   ]
-
+}
 
 /*
+
 resource "null_resource" "previous" {}
 resource "time_sleep" "wait_2m" {
   depends_on = [null_resource.previous]
