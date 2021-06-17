@@ -207,10 +207,6 @@ resource "google_service_account_key" "hubsa_credentials" {
   public_key_type    = "TYPE_X509_PEM_FILE"
 }
 
-resource "local_file" "key" {
-  filename = "/home/gaurav_kumar/output"
-  content  = "${base64decode(google_service_account_key.hubsa_credentials.private_key)}"
-}
 
 /*
 #Anthos - Make GKE Anthos Cluster
