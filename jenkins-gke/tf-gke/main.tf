@@ -208,7 +208,6 @@ resource "google_service_account_key" "hubsa_credentials" {
 }
 
 
-/*
 #Anthos - Make GKE Anthos Cluster
 module "hub" {
   source                  = "terraform-google-modules/kubernetes-engine/google//modules/hub"
@@ -223,7 +222,7 @@ module "hub" {
   module_depends_on       = var.module_depends_on
 }
 
-
+/*
 module "asm-jenkins" {
   source           = "terraform-google-modules/kubernetes-engine/google//modules/asm"
   version          = "13.0.0"
