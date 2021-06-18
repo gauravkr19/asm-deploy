@@ -231,7 +231,7 @@ module "asm-jenkins" {
   service_account       = google_service_account.hubsa.email
   key_file              = "${path.module}/hubsa-credentials.json"
   options               = ["envoy-access-log,egressgateways"]
-  custom_overlays       = ["./custom_ingress_gateway.yaml"]
+  #custom_overlays       = ["./custom_ingress_gateway.yaml"]
   skip_validation       = true
   outdir                = "./${module.jenkins-gke.name}-outdir-${var.asm_version}"
   #depends_on           = [local_file.cred_file]
