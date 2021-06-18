@@ -209,7 +209,7 @@ module "hub" {
 module "asm-jenkins" {
   source           = "terraform-google-modules/kubernetes-engine/google//modules/asm"
   version          = "13.0.0"
-  asm_version      = "1.7.8-asm.8"
+  asm_version      = "1.8.3-asm.2+config2"
   project_id       = data.google_client_config.default.project
   cluster_name     = var.clusname
   location         = module.jenkins-gke.location
