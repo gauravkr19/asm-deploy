@@ -234,7 +234,7 @@ module "asm-jenkins" {
   custom_overlays       = ["./custom_ingress_gateway.yaml"]
   skip_validation       = true
   outdir                = "./${module.jenkins-gke.name}-outdir-${var.asm_version}"
-  depends_on           = [local_file.cred_file]
+  #depends_on           = [local_file.cred_file]
 }
 
 /*
