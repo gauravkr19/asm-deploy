@@ -217,7 +217,6 @@ module "hub" {
   module_depends_on       = var.module_depends_on
 }
 
-/*
 
 resource "local_file" "cred_file" {
   content  = "${base64decode(google_service_account_key.hubsa_credentials.private_key)}"
@@ -249,6 +248,8 @@ module "asm-jenkins" {
   #depends_on           = [local_file.cred_file]
 }
 
+
+/*
 
 module "acm-jenkins" {
   source           = "github.com/terraform-google-modules/terraform-google-kubernetes-engine//modules/acm"
