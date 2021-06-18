@@ -222,6 +222,28 @@ module "hub" {
   module_depends_on       = var.module_depends_on
 }
 
+resource "null_resource" "client-cluster-asm" {
+
+  depends_on = [module.jenkins-gke]
+
+  provisioner "local-exec" {
+    command = <<EOF
+unset KUBECONFIG
+./set-project-and-cluster-client.sh
+./install_asm.sh
+EOF
+    environment = {
+      PROJECT_ID = var.project_id
+      ZONE = var.zones[0]
+      TYPE = "client"
+      TERRAFORM_ROOT = abspath(path.root)
+      ASM_VERSION    = "1.7.3-asm.6"
+      ASM_REVISION   = "173-6"
+    }
+  }
+}
+
+
 /*
 module "asm-jenkins" {
   source           = "terraform-google-modules/kubernetes-engine/google//modules/asm"
