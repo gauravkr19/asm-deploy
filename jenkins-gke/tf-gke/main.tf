@@ -222,6 +222,7 @@ module "asm-jenkins" {
   enable_gcp_components = true
   enable_registration   = false
   managed_control_plane = false
+  service_account       = google_service_account.hubsa.email
   options               = ["envoy-access-log,egressgateways"]
   custom_overlays       = ["./custom_ingress_gateway.yaml"]
   skip_validation       = true
