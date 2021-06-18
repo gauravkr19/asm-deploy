@@ -218,12 +218,12 @@ module "asm-jenkins" {
   enable_cluster_roles  = true
   enable_cluster_labels = false
   enable_gcp_apis       = false
-  enable_gcp_iam_roles  = true
+#  enable_gcp_iam_roles  = true
   enable_gcp_components = true
   enable_registration   = false
   managed_control_plane = false
-  service_account       = google_service_account.hubsa.email
-  key_file        = google_service_account_key.hubsa_credentials.private_key
+#  service_account       = google_service_account.hubsa.email
+#  key_file              = google_service_account_key.hubsa_credentials.private_key
   options               = ["envoy-access-log,egressgateways"]
   custom_overlays       = ["./custom_ingress_gateway.yaml"]
   skip_validation       = true
