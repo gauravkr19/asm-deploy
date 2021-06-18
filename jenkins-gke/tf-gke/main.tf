@@ -222,7 +222,7 @@ module "hub" {
   module_depends_on       = var.module_depends_on
 }
 
-
+/*
 resource "null_resource" "client-cluster-asm" {
 
   depends_on = [module.jenkins-gke]
@@ -235,7 +235,7 @@ unset KUBECONFIG
 EOF
     environment = {
       PROJECT_ID = var.project_id
-      ZONE = var.zones[0]
+      ZONE = var.region
       TYPE = "client"
       TERRAFORM_ROOT = abspath(path.root)
       ASM_VERSION    = "1.7.3-asm.6"
@@ -245,7 +245,6 @@ EOF
 }
 
 
-/*
 
 module "asm-jenkins" {
   source           = "terraform-google-modules/kubernetes-engine/google//modules/asm"
