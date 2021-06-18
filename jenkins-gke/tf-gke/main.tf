@@ -97,6 +97,17 @@ module "jenkins-gke" {
   ]
 }
 
+resource "kubernetes_namespace" "istio" {
+  metadata {
+     name = "istio-system"
+  }
+}
+resource "kubernetes_namespace" "hub" {
+  metadata {
+     name = "gke-connect"
+  }
+}
+
 /*****************************************
   Jenkins Workload Identity
  *****************************************/
