@@ -175,6 +175,7 @@ resource "google_storage_bucket_iam_member" "tf-state-writer" {
     member = module.workload_identity.gcp_service_account_fqn
   }
 
+/*
 resource "google_service_account" "hubsa" {
   account_id   = "hub-svc-sa"
   display_name = "My Service Account"
@@ -236,7 +237,6 @@ module "asm-jenkins" {
   #depends_on           = [local_file.cred_file]
 }
 
-/*
 
 module "acm-jenkins" {
   source           = "github.com/terraform-google-modules/terraform-google-kubernetes-engine//modules/acm"
