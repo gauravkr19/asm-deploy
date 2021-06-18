@@ -218,7 +218,6 @@ module "asm-jenkins" {
   #depends_on       = [module.hub.sa_private_key]
 }
 
-/*
 module "acm-jenkins" {
   source           = "github.com/terraform-google-modules/terraform-google-kubernetes-engine//modules/acm"
 
@@ -234,6 +233,7 @@ module "acm-jenkins" {
   #depends_on	     = [module.asm-jenkins.asm_dir]
 }
 
+/*
 resource "null_resource" "wait" {
   depends_on = [module.acm-jenkins.wait, module.asm-jenkins.asm_wait]
 }
