@@ -206,10 +206,11 @@ module "hub" {
   module_depends_on       = var.module_depends_on
 }
 
+/*
 module "asm-jenkins" {
   source           = "terraform-google-modules/kubernetes-engine/google//modules/asm"
-  version          = "13.0.0"
-  #asm_version      = "1.9"
+  version          = "14.3.0"
+  asm_version      = "1.9"
   project_id       = data.google_client_config.default.project
   cluster_name     = var.clusname
   location         = module.jenkins-gke.location
@@ -233,7 +234,6 @@ module "acm-jenkins" {
   #depends_on	     = [module.asm-jenkins.asm_dir]
 }
 
-/*
 resource "null_resource" "wait" {
   depends_on = [module.acm-jenkins.wait, module.asm-jenkins.asm_wait]
 }
