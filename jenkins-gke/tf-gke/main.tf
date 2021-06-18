@@ -222,6 +222,7 @@ module "hub" {
   module_depends_on       = var.module_depends_on
 }
 
+/*
 
 module "asm-jenkins" {
   source           = "terraform-google-modules/kubernetes-engine/google//modules/asm"
@@ -235,7 +236,6 @@ module "asm-jenkins" {
   #depends_on       = [module.hub.sa_private_key]
 }
 
-/*
 
 module "acm-jenkins" {
   source           = "github.com/terraform-google-modules/terraform-google-kubernetes-engine//modules/acm"
