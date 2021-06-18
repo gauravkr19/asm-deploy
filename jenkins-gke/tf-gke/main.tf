@@ -206,16 +206,34 @@ module "hub" {
   module_depends_on       = var.module_depends_on
 }
 
+resource "local_file" "cred_file" {
+  content  = "${base64decode(google_service_account_key.hubsa_credentials.private_key)}"
+  filename = "${path.module}/hubsa-credentials.json"
+}
+
 module "asm-jenkins" {
   source           = "terraform-google-modules/kubernetes-engine/google//modules/asm"
-  version          = "14.3.0"
-  asm_version      = "1.9"
+  version          = "15.0.0"
+  asm_version      = var.asm_version
   project_id       = data.google_client_config.default.project
   cluster_name     = var.clusname
   location         = module.jenkins-gke.location
   cluster_endpoint = module.jenkins-gke.endpoint
-  asm_dir          = "asm-dir-${module.jenkins-gke.name}"
-  #depends_on       = [module.hub.sa_private_key]
+  enable_all            = false
+  enable_cluster_roles  = true
+  enable_cluster_labels = false
+  enable_gcp_apis       = false
+  enable_gcp_iam_roles  = true
+  enable_gcp_components = true
+  enable_registration   = false
+  managed_control_plane = false
+  service_account       = google_service_account.hubsa.email
+  key_file              = "${path.module}/hubsa-credentials.json"
+  options               = ["envoy-access-log,egressgateways"]
+  #custom_overlays       = ["./custom_ingress_gateway.yaml"]
+  skip_validation       = true
+  outdir                = "./${module.jenkins-gke.name}-outdir-${var.asm_version}"
+  #depends_on           = [local_file.cred_file]
 }
 
 /*
