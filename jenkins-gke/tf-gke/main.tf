@@ -222,7 +222,6 @@ module "hub" {
   module_depends_on       = var.module_depends_on
 }
 
-/*
 
 resource "null_resource" "client-cluster-asm" {
 
@@ -239,12 +238,13 @@ EOF
       ZONE = var.region
       TYPE = "client"
       TERRAFORM_ROOT = abspath(path.root)
-      ASM_VERSION    = "1.8.1-asm.1"
-      ASM_REVISION   = "181-1"
+      ASM_VERSION    = "1.8.5-asm.2"
+      ASM_REVISION   = "185-2"
     }
   }
 }
 
+/*
 
 module "asm-jenkins" {
   source           = "terraform-google-modules/kubernetes-engine/google//modules/asm"
