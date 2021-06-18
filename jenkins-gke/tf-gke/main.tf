@@ -212,6 +212,7 @@ resource "local_file" "cred_file" {
   depends_on = [module.hub]
 }
 
+/*
 module "asm-jenkins" {
   source           = "terraform-google-modules/kubernetes-engine/google//modules/asm"
   version          = "15.0.0"
@@ -237,7 +238,6 @@ module "asm-jenkins" {
   #depends_on           = [local_file.cred_file]
 }
 
-/*
 
 module "acm-jenkins" {
   source           = "github.com/terraform-google-modules/terraform-google-kubernetes-engine//modules/acm"
