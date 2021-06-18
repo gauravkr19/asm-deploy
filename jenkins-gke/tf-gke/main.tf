@@ -211,10 +211,10 @@ module "asm-jenkins" {
   version          = "13.0.0"
   asm_version      = "1.7.3-asm.3"
   project_id       = data.google_client_config.default.project
-  cluster_name     = google_container_cluster.gke-jenkins.name
-  location         = google_container_cluster.gke-jenkins.location
-  cluster_endpoint = google_container_cluster.gke-jenkins.endpoint
-  asm_dir          = "asm-dir-jenkins-asm"
+  cluster_name     = var.clusname
+  location         = module.jenkins-gke.location
+  cluster_endpoint = module.jenkins-gke.endpoint
+  asm_dir          = "asm-dir-${module.jenkins-gke.name}"
   #depends_on       = [module.hub.sa_private_key]
 }
 
