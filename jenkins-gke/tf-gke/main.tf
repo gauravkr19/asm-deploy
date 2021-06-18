@@ -53,22 +53,6 @@ data "google_project" "project" {
   project_id = var.project_id
 }
 
-# resource "kubernetes_cluster_role_binding" "user" {
-#   metadata {
-#     name = "terraform-example"
-#   }
-#   role_ref {
-#     api_group = "rbac.authorization.k8s.io"
-#     kind      = "ClusterRole"
-#     name      = "cluster-admin"
-#   }
-#   subject {
-#     kind      = "User"
-#     name      = "${var.currentuser}"
-#     api_group = "rbac.authorization.k8s.io"
-#   }
-# }
-
 /*****************************************
   Jenkins GKE
  *****************************************/
@@ -222,40 +206,28 @@ module "hub" {
   module_depends_on       = var.module_depends_on
 }
 
-
-resource "null_resource" "client-cluster-asm" {
-
-  depends_on = [module.jenkins-gke]
-
-  provisioner "local-exec" {
-    command = <<EOF
-unset KUBECONFIG
-./set-project-and-cluster-client.sh
-./install_asm.sh
-EOF
-    environment = {
-      PROJECT_ID = var.project_id
-      ZONE = var.region
-      TYPE = "client"
-      TERRAFORM_ROOT = abspath(path.root)
-      ASM_VERSION    = "1.8.5-asm.2"
-      ASM_REVISION   = "185-2"
-    }
-  }
-}
-
-/*
-
+/* 
 module "asm-jenkins" {
   source           = "terraform-google-modules/kubernetes-engine/google//modules/asm"
-  version          = "13.0.0"
-  asm_version      = "1.7.3-asm.3"
+  version          = "15.0.0"
+  asm_version      = var.asm_version
   project_id       = data.google_client_config.default.project
   cluster_name     = var.clusname
   location         = module.jenkins-gke.location
   cluster_endpoint = module.jenkins-gke.endpoint
-  asm_dir          = "asm-dir-${module.jenkins-gke.name}"
-  #depends_on       = [module.hub.sa_private_key]
+  enable_all            = false
+  enable_cluster_roles  = true
+  enable_cluster_labels = false
+  enable_gcp_apis       = false
+  enable_gcp_iam_roles  = true
+  enable_gcp_components = true
+  enable_registration   = false
+  managed_control_plane = false
+  options               = ["envoy-access-log,egressgateways"]
+  custom_overlays       = ["./custom_ingress_gateway.yaml"]
+  skip_validation       = true
+  outdir                = "./${module.jenkins-gke.name}-outdir-${var.asm_version}"
+  #depends_on           = [module.hub.sa_private_key]
 }
 
 
@@ -340,4 +312,4 @@ resource "null_resource" "istio-comp" {
   depends_on = [kubernetes_namespace.apps-ns, null_resource.deployapps, time_sleep.wait_2m,]
 }
 
-*/
+ */

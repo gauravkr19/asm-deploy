@@ -7,15 +7,10 @@ variable "module_depends_on" {
     "google_service_account.hubsa",
     "google_project_iam_member.hubaccess",
     "google_service_account_key.hubsa_credentials",
-    "module.jenkins-gk.name"
+    "module.jenkins-gke"
     ]
   description = "Modules that are required to run before this module does"
   type        = list
-}
-
-variable "currentuser" {
-  description = "Current-User"
-  type        = string
 }
 
 variable "project_id" {
@@ -107,4 +102,10 @@ variable "acm_branch" {
 }
 variable "acm_dir" {
   description = "The directory in git ACM will sync to"
+}
+
+variable "asm_version" {
+  type        = string
+  default     = "1.8"
+  description = "description"
 }
