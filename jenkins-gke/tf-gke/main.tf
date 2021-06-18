@@ -175,7 +175,6 @@ resource "google_storage_bucket_iam_member" "tf-state-writer" {
     member = module.workload_identity.gcp_service_account_fqn
   }
 
-/*
 resource "google_service_account" "hubsa" {
   account_id   = "hub-svc-sa"
   display_name = "My Service Account"
@@ -206,6 +205,8 @@ module "hub" {
   sa_private_key          = google_service_account_key.hubsa_credentials.private_key
   module_depends_on       = var.module_depends_on
 }
+
+/*
 
 resource "local_file" "cred_file" {
   content  = "${base64decode(google_service_account_key.hubsa_credentials.private_key)}"
