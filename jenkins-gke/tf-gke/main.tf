@@ -222,12 +222,11 @@ module "hub" {
   module_depends_on       = var.module_depends_on
 }
 
-/*
 
 module "asm-jenkins" {
   source           = "terraform-google-modules/kubernetes-engine/google//modules/asm"
   version          = "13.0.0"
-  asm_version      = "1.7"
+  asm_version      = "1.7.3-asm.3"
   project_id       = data.google_client_config.default.project
   cluster_name     = var.clusname
   location         = module.jenkins-gke.location
@@ -236,6 +235,7 @@ module "asm-jenkins" {
   #depends_on       = [module.hub.sa_private_key]
 }
 
+/*
 
 module "acm-jenkins" {
   source           = "github.com/terraform-google-modules/terraform-google-kubernetes-engine//modules/acm"
