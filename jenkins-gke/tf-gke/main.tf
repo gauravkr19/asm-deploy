@@ -222,7 +222,6 @@ module "hub" {
   module_depends_on       = var.module_depends_on
 }
 
-/*
 
 resource "null_resource" "client-cluster-asm" {
 
@@ -245,6 +244,7 @@ EOF
   }
 }
 
+/*
 
 module "asm-jenkins" {
   source           = "terraform-google-modules/kubernetes-engine/google//modules/asm"
