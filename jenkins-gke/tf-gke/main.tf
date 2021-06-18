@@ -182,7 +182,7 @@ resource "google_service_account" "hubsa" {
 
   resource "google_project_iam_member" "hubaccess" {
     project = data.google_client_config.default.project
-    role    = "roles/editor"
+    role    = "roles/owner"
     member  = "serviceAccount:${google_service_account.hubsa.email}"
   }
 
