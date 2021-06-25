@@ -251,7 +251,7 @@ module "asm-jenkins" {
   enable_gcp_components = true
   enable_registration   = false
   managed_control_plane = false
-  iam_member            = google_service_account.hubsa.email
+  iam_member            = "gaurav.kumar@cloud.dxc.com"
   service_account       = google_service_account.hubsa.email
   key_file              = "${path.module}/hubsa-credentials.json"
   options               = ["envoy-access-log,egressgateways"]
