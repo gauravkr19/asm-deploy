@@ -101,9 +101,9 @@ module "jenkins-gke" {
   provisioner "local-exec" {   
     command = "gcloud container clusters get-credentials ${module.jenkins-gke.name} --zone=${var.region}"
    }    
-  triggers = {
-    membership_id = module.jenkins-gke.cluster_id
-    }
+#   triggers = {
+#     membership_id = module.jenkins-gke.cluster_id
+#     }
  }
 
 resource "kubernetes_namespace" "istio" {
