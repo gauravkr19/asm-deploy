@@ -83,7 +83,6 @@ module "asm-services" {
 }
 
 resource "time_sleep" "wait_3m" {
-  depends_on = [module.asm_install.wait]
   create_duration = "2m"
 }
 
