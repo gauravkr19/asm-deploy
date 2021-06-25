@@ -82,9 +82,9 @@ module "asm-services" {
   ]
 }
 
-resource "time_sleep" "wait_1m" {
-  depends_on = [time_sleep.wait_3m]
-  create_duration = "1m"
+resource "time_sleep" "wait_4m" {
+  depends_on = [module.asm_install.wait]
+  create_duration = "4m"
 }
 
 module "asm_install" {
