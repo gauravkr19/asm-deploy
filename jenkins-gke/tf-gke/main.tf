@@ -247,7 +247,7 @@ module "asm-jenkins" {
   enable_cluster_roles  = false
   enable_cluster_labels = false
   enable_gcp_apis       = false
-  enable_gcp_iam_roles  = true
+  enable_gcp_iam_roles  = false
   enable_gcp_components = true
   enable_registration   = false
   managed_control_plane = false
