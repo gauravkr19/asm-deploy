@@ -211,7 +211,7 @@ resource "local_file" "cred_file" {
 
 
 resource "time_sleep" "wait_2m" {
-  depends_on = [module.anthos-gke]
+  depends_on = [module.jenkins-gke]
   create_duration = "2m"
 }
 
