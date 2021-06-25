@@ -238,7 +238,7 @@ resource "time_sleep" "wait_3m" {
 module "asm-jenkins" {
   #source           = "terraform-google-modules/kubernetes-engine/google//modules/asm"
   source           = "./modules/asm"
-  version          = "15.0.0"
+  #version          = "15.0.0"
   asm_version      = var.asm_version
   project_id       = data.google_client_config.default.project
   cluster_name     = var.clusname
