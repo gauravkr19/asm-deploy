@@ -235,7 +235,16 @@ resource "time_sleep" "wait_1m" {
 }
 
  # //container.googleapis.com/projects/my-project/zones/us-west1-a/clusters/my-cluster
- 
+
+resource "time_sleep" "wait_3m" {
+  create_duration = "2m"
+    triggers = {
+    # This sets up a proper dependency on the RAM association
+      cluster_name = module.asm-jenkins.cluster_name
+    }
+}
+
+
 module "asm-jenkins" {
   #source           = "terraform-google-modules/kubernetes-engine/google//modules/asm"
   source           = "./modules/asm"
