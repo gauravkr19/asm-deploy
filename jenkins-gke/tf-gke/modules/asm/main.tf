@@ -90,7 +90,7 @@ resource "time_sleep" "wait_3m" {
 module "asm_install" {
   source            = "terraform-google-modules/gcloud/google//modules/kubectl-wrapper"
   version           = "~> 2.1.0"
-  module_depends_on = concat([var.cluster_endpoint], local.additional_depends_on)
+  module_depends_on = concat([var.cluster_endpoint], local.additional_depends_on, time_sleep.wait_3m)
 
   gcloud_sdk_version          = var.gcloud_sdk_version
   upgrade                     = true
@@ -100,7 +100,6 @@ module "asm_install" {
   project_id                  = var.project_id
   service_account_key_file    = var.service_account_key_file
   impersonate_service_account = var.impersonate_service_account
-  module_depends_on           = time_sleep.wait_3m
 
   kubectl_create_command  = "${path.module}/scripts/install_asm.sh ${var.project_id} ${var.cluster_name} ${var.location} ${var.asm_version} ${var.mode} ${var.managed_control_plane} ${var.skip_validation} ${local.options_string} ${local.custom_overlays_string} ${var.enable_all} ${var.enable_cluster_roles} ${var.enable_cluster_labels} ${var.enable_gcp_components} ${var.enable_registration} ${var.outdir} ${var.ca} ${local.ca_cert} ${local.ca_key} ${local.root_cert} ${local.cert_chain} ${local.service_account_string} ${local.key_file_string} ${local.asm_git_tag_string}"
   kubectl_destroy_command = "${path.module}/scripts/destroy_asm.sh"
