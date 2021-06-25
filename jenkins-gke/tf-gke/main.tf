@@ -209,7 +209,7 @@ resource "local_file" "cred_file" {
   filename = "${path.module}/hubsa-credentials.json"
 }
 
-
+/*
 resource "time_sleep" "wait_2m" {
   depends_on = [module.jenkins-gke]
   create_duration = "2m"
@@ -269,6 +269,8 @@ module "asm-jenkins" {
   outdir                = "./${module.jenkins-gke.name}-outdir-${var.asm_version}"
   #depends_on           = [time_sleep.wait_3m]
 }
+
+*/
 
 # module "acm-jenkins" {
 #   source           = "github.com/terraform-google-modules/terraform-google-kubernetes-engine//modules/acm"
