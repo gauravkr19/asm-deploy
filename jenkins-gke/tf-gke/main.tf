@@ -261,9 +261,9 @@ module "asm-jenkins" {
   enable_gcp_components = true
   enable_registration   = false
   managed_control_plane = false
-#   service_account       = google_service_account.hubsa.email
-#   key_file              = "${path.module}/hubsa-credentials.json"
-#   options               = ["envoy-access-log,egressgateways"]
+  service_account       = google_service_account.hubsa.email
+  key_file              = "${path.module}/hubsa-credentials.json"
+  options               = ["envoy-access-log,egressgateways"]
   #custom_overlays       = ["./custom_ingress_gateway.yaml"]
   skip_validation       = true
   outdir                = "./${module.jenkins-gke.name}-outdir-${var.asm_version}"
