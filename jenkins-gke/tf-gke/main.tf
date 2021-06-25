@@ -214,7 +214,6 @@ resource "time_sleep" "wait_3m" {
   create_duration = "3m"
 }
 
-/*
 
 #Anthos - Make GKE Anthos Cluster
 module "asm-jenkins" {
@@ -256,7 +255,7 @@ resource "google_gke_hub_membership" "membership" {
   description = "Anthos Cluster Hub Registration"
   provider = google-beta
 }
-*/
+
 
 # module "acm-jenkins" {
 #   source           = "github.com/terraform-google-modules/terraform-google-kubernetes-engine//modules/acm"
