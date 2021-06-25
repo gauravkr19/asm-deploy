@@ -244,7 +244,7 @@ module "asm-jenkins" {
   location         = module.jenkins-gke.location
   cluster_endpoint = module.jenkins-gke.endpoint
   enable_all            = false
-  enable_cluster_roles  = false
+  enable_cluster_roles  = true
   enable_cluster_labels = false
   enable_gcp_apis       = false
   enable_gcp_iam_roles  = false
