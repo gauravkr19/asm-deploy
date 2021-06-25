@@ -82,10 +82,26 @@ module "asm-services" {
   ]
 }
 
+variable "depends" {
+  default = []
+}
+
+resource "null_resource" "depends_on" {
+  triggers = {
+    depends_on = "${join("", var.depends)}"
+  }
+}
+
+resource "time_sleep" "wait_3m" {
+  create_duration = "3m"
+}
+
 module "asm_install" {
   source            = "terraform-google-modules/gcloud/google//modules/kubectl-wrapper"
   version           = "~> 2.1.0"
   module_depends_on = concat([var.cluster_endpoint], local.additional_depends_on)
+
+  depends_on                  = [time_sleep.wait_3m]
 
   gcloud_sdk_version          = var.gcloud_sdk_version
   upgrade                     = true
