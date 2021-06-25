@@ -74,7 +74,6 @@ module "jenkins-gke" {
   service_account          = "create"
   identity_namespace       = "${data.google_client_config.default.project}.svc.id.goog"
   node_metadata            = "GKE_METADATA_SERVER"
-  cluster_resource_labels  = { "mesh_id" : "proj-${data.google_project.project.number}" }
   network_policy             = true
   http_load_balancing        = false
   horizontal_pod_autoscaling = true
@@ -186,43 +185,56 @@ resource "google_storage_bucket_iam_member" "tf-state-writer" {
     member = module.workload_identity.gcp_service_account_fqn
   }
 
+/*****************************************
+  SA for ASM
+ *****************************************/
 resource "google_service_account" "hubsa" {
   account_id   = "hub-svc-sa"
   display_name = "My Service Account"
 }
 
-  resource "google_project_iam_member" "hubaccess" {
-    project = data.google_client_config.default.project
-    role    = "roles/owner"
-    member  = "serviceAccount:${google_service_account.hubsa.email}"
-  }
+resource "google_project_iam_member" "hubaccess" {
+  project = data.google_client_config.default.project
+  role    = "roles/owner"
+  member  = "serviceAccount:${google_service_account.hubsa.email}"
+}
 
 resource "google_service_account_key" "hubsa_credentials" {
   service_account_id = google_service_account.hubsa.name
   public_key_type    = "TYPE_X509_PEM_FILE"
 }
 
-
-#Anthos - Make GKE Anthos Cluster
-module "hub" {
-  source                  = "terraform-google-modules/kubernetes-engine/google//modules/hub"
-  project_id              = data.google_client_config.default.project
-  location                = module.jenkins-gke.location
-  cluster_name            = var.clusname
-  cluster_endpoint        = module.jenkins-gke.endpoint
-  gke_hub_membership_name = var.clusname
-  use_existing_sa         = true
-  gke_hub_sa_name         = google_service_account.hubsa.account_id
-  sa_private_key          = google_service_account_key.hubsa_credentials.private_key
-  module_depends_on       = var.module_depends_on
-}
-
-
 resource "local_file" "cred_file" {
   content  = "${base64decode(google_service_account_key.hubsa_credentials.private_key)}"
   filename = "${path.module}/hubsa-credentials.json"
 }
 
+
+resource "time_sleep" "wait_2m" {
+  depends_on = [module.anthos-gke]
+  create_duration = "2m"
+}
+
+#Anthos - Make GKE Anthos Cluster
+resource "google_gke_hub_membership" "membership" {
+  depends_on = [time_sleep.wait_2m]
+  membership_id = "anthos-gke"
+  endpoint {
+    gke_cluster {
+      resource_link = "//container.googleapis.com/projects/${var.project_id}/locations/${var.region}/clusters/${var.clusname}"
+    }
+  }
+  description = "Anthos Cluster Hub Registration"
+  provider = google-beta
+}
+
+resource "time_sleep" "wait_3m" {
+  depends_on = [google_gke_hub_membership.membership]
+  create_duration = "3m"
+}
+
+ # //container.googleapis.com/projects/my-project/zones/us-west1-a/clusters/my-cluster
+ 
 module "asm-jenkins" {
   source           = "terraform-google-modules/kubernetes-engine/google//modules/asm"
   version          = "15.0.0"
@@ -245,91 +257,71 @@ module "asm-jenkins" {
   #custom_overlays       = ["./custom_ingress_gateway.yaml"]
   skip_validation       = true
   outdir                = "./${module.jenkins-gke.name}-outdir-${var.asm_version}"
-  #depends_on           = [local_file.cred_file]
+  depends_on           = [time_sleep.wait_3m]
 }
 
+# module "acm-jenkins" {
+#   source           = "github.com/terraform-google-modules/terraform-google-kubernetes-engine//modules/acm"
 
-/*
+#   project_id       = data.google_client_config.default.project
+#   cluster_name     = var.clusname
+#   location         = module.jenkins-gke.location
+#   cluster_endpoint = module.jenkins-gke.endpoint
 
-module "acm-jenkins" {
-  source           = "github.com/terraform-google-modules/terraform-google-kubernetes-engine//modules/acm"
+#   operator_path    = "config-management-operator.yaml"
+#   sync_repo        = var.acm_repo_location
+#   sync_branch      = var.acm_branch
+#   policy_dir       = var.acm_dir
+#   #depends_on	     = [module.asm-jenkins.asm_dir]
+# }
 
-  project_id       = data.google_client_config.default.project
-  cluster_name     = var.clusname
-  location         = module.jenkins-gke.location
-  cluster_endpoint = module.jenkins-gke.endpoint
-
-  operator_path    = "config-management-operator.yaml"
-  sync_repo        = var.acm_repo_location
-  sync_branch      = var.acm_branch
-  policy_dir       = var.acm_dir
-  #depends_on	     = [module.asm-jenkins.asm_dir]
-}
-
-resource "null_resource" "wait" {
-  depends_on = [module.acm-jenkins.wait, module.asm-jenkins.asm_wait]
-}
 
 ####--zone=${element(jsonencode(var.zones), 0)}" 
- resource "null_resource" "get-credentials" {
-  depends_on = [
-    module.asm-jenkins.asm_wait,
-    module.acm-jenkins.wait,
-  ] 
-  provisioner "local-exec" {   
-    command = "gcloud container clusters get-credentials ${module.jenkins-gke.name} --zone=${var.region}"
-   }
- }
+#  resource "null_resource" "get-credentials" {
+#   depends_on = [
+#     module.asm-jenkins.asm_wait,
+#     module.acm-jenkins.wait,
+#   ] 
+#   provisioner "local-exec" {   
+#     command = "gcloud container clusters get-credentials ${module.jenkins-gke.name} --zone=${var.region}"
+#    }
+#  }
 
-data "local_file" "helm_chart_values" {
-  filename    = "${path.module}/values.yaml"
-}
-resource "helm_release" "jenkins" {
-  name       = "jenkins"
-  repository = "https://charts.jenkins.io"
-  chart      = "jenkins"
-  #version   = "3.3.10"
-  timeout    = 600
-  values     = [data.local_file.helm_chart_values.content]
-  depends_on = [
-    kubernetes_secret.gh-secrets, 
-    null_resource.get-credentials,
-    data.local_file.helm_chart_values,
-    module.asm-jenkins.asm_wait,
-    module.acm-jenkins.wait,
-  ]
-}
+# data "local_file" "helm_chart_values" {
+#   filename    = "${path.module}/values.yaml"
+# }
+# resource "helm_release" "jenkins" {
+#   name       = "jenkins"
+#   repository = "https://charts.jenkins.io"
+#   chart      = "jenkins"
+#   #version   = "3.3.10"
+#   timeout    = 600
+#   values     = [data.local_file.helm_chart_values.content]
+#   depends_on = [
+#     kubernetes_secret.gh-secrets, 
+#     null_resource.get-credentials,
+#     data.local_file.helm_chart_values,
+#     module.asm-jenkins.asm_wait,
+#     module.acm-jenkins.wait,
+#   ]
+# }
 
+# resource "null_resource" "previous" {}
+# resource "time_sleep" "wait_2m" {
+#   depends_on = [null_resource.previous]
+#   create_duration = "2m"
+# }
 
-resource "null_resource" "previous" {}
-resource "time_sleep" "wait_2m" {
-  depends_on = [null_resource.previous]
-  create_duration = "2m"
-}
-
-resource "kubernetes_namespace" "apps-ns" {
-  depends_on = [helm_release.jenkins]
-  metadata {
-
-    labels = {
-      "istio.io/rev" = "apps-ns"
-    }
-    name = "apps-ns"
-  }
-}
-
-resource "null_resource" "deployapps" {
-  provisioner "local-exec" {
-    command = "kubectl apply -n apps-ns -f https://raw.githubusercontent.com/istio/istio/master/samples/bookinfo/platform/kube/bookinfo.yaml"
-  }
-  depends_on = [kubernetes_namespace.apps-ns]
-}
-
-resource "null_resource" "istio-comp" {
-  provisioner "local-exec" {
-    command = "kubectl apply -n apps-ns -f https://raw.githubusercontent.com/istio/istio/master/samples/bookinfo/networking/bookinfo-gateway.yaml"
-  }
-  depends_on = [kubernetes_namespace.apps-ns, null_resource.deployapps, time_sleep.wait_2m,]
-}
-
-*/
+# #Anthos - Make GKE Anthos Cluster
+# module "hub" {
+#   source                  = "terraform-google-modules/kubernetes-engine/google//modules/hub"
+#   project_id              = data.google_client_config.default.project
+#   location                = module.jenkins-gke.location
+#   cluster_name            = var.clusname
+#   cluster_endpoint        = module.jenkins-gke.endpoint
+#   gke_hub_membership_name = var.clusname
+#   use_existing_sa         = true
+#   gke_hub_sa_name         = google_service_account.hubsa.account_id
+#   sa_private_key          = google_service_account_key.hubsa_credentials.private_key
+#   module_depends_on       = var.module_depends_on
+# }
