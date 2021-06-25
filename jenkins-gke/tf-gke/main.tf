@@ -209,7 +209,6 @@ resource "local_file" "cred_file" {
   filename = "${path.module}/hubsa-credentials.json"
 }
 
-/*
 resource "time_sleep" "wait_2m" {
   depends_on = [module.jenkins-gke]
   create_duration = "2m"
@@ -236,7 +235,7 @@ resource "time_sleep" "wait_1m" {
 
  # //container.googleapis.com/projects/my-project/zones/us-west1-a/clusters/my-cluster
 
-resource "time_sleep" "wait_3m" {
+resource "time_sleep" "wait_2mn" {
   create_duration = "2m"
     triggers = {
       membership_id = google_gke_hub_membership.membership.id
@@ -270,7 +269,7 @@ module "asm-jenkins" {
   #depends_on           = [time_sleep.wait_3m]
 }
 
-*/
+
 
 # module "acm-jenkins" {
 #   source           = "github.com/terraform-google-modules/terraform-google-kubernetes-engine//modules/acm"
