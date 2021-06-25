@@ -24,6 +24,13 @@ variable "cluster_endpoint" {
   type        = string
 }
 
+variable "wait_sleep" {
+  type        = list
+  default     = []
+  description = "wait"
+}
+
+
 variable "project_id" {
   description = "The project in which the resource belongs."
   type        = string
