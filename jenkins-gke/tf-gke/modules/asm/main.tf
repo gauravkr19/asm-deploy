@@ -84,12 +84,16 @@ module "asm-services" {
 
 resource "time_sleep" "wait_3m" {
   create_duration = "2m"
+    triggers = {
+    # This sets up a proper dependency on the RAM association
+      cluster_name = module.asm_install.cluster_name
+    }
 }
 
 module "asm_install" {
-  source            = "terraform-google-modules/gcloud/google//modules/kubectl-wrapper"
-  version           = "~> 2.1.0"
-  module_depends_on = concat([var.cluster_endpoint], local.additional_depends_on, [var.wait_sleep])
+  source            = "./modules/kubectl-wrapper"
+  #version           = "~> 2.1.0"
+  module_depends_on = concat([var.cluster_endpoint], local.additional_depends_on)
 
   gcloud_sdk_version          = var.gcloud_sdk_version
   upgrade                     = true

@@ -14,11 +14,6 @@
  * limitations under the License.
  */
 
-output "wait_for_hub" {
-  value       = "time_sleep.wait_3m"
-  description = "description"
-}
-
 output "kubernetes_endpoint" {
   description = "The cluster endpoint"
   sensitive   = true
