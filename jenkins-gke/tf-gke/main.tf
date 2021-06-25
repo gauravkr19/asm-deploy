@@ -239,7 +239,7 @@ resource "time_sleep" "wait_1m" {
 resource "time_sleep" "wait_3m" {
   create_duration = "2m"
     triggers = {
-      membership_id = google_gke_hub_membership.membership.membership_id
+      membership_id = google_gke_hub_membership.membership
     }
 }
 
