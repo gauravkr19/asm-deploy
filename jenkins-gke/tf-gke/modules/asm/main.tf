@@ -91,7 +91,7 @@ resource "time_sleep" "wait_3m" {
 }
 
 module "asm_install" {
-  source            = "./modules/kubectl-wrapper"
+  source            = "terraform-google-modules/gcloud/google//modules/kubectl-wrapper"
   #version           = "~> 2.1.0"
   module_depends_on = concat([var.cluster_endpoint], local.additional_depends_on)
 
