@@ -96,13 +96,13 @@ module "jenkins-gke" {
   ]
 }
 
- resource "null_resource" "get-credentials" {
+ resource "null_resource" "get-credential" {
   depends_on = [module.jenkins-gke] 
   provisioner "local-exec" {   
     command = "gcloud container clusters get-credentials ${module.jenkins-gke.name} --zone=${var.region}"
    }    
   triggers = {
-    membership_id = [module.jenkins-gke.cluster_id
+    membership_id = module.jenkins-gke.cluster_id
     }
  }
 
