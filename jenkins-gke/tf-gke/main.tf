@@ -217,8 +217,9 @@ resource "time_sleep" "wait_2m" {
 
 #Anthos - Make GKE Anthos Cluster
 resource "google_gke_hub_membership" "membership" {
-  depends_on = [time_sleep.wait_2m]
+  depends_on    = [time_sleep.wait_2m]
   membership_id = "anthos-gke"
+  project       = var.project_id
   endpoint {
     gke_cluster {
       resource_link = "//container.googleapis.com/projects/${var.project_id}/locations/${var.region}/clusters/${var.clusname}"
@@ -228,9 +229,9 @@ resource "google_gke_hub_membership" "membership" {
   provider = google-beta
 }
 
-resource "time_sleep" "wait_3m" {
+resource "time_sleep" "wait_1m" {
   depends_on = [google_gke_hub_membership.membership]
-  create_duration = "3m"
+  create_duration = "1m"
 }
 
  # //container.googleapis.com/projects/my-project/zones/us-west1-a/clusters/my-cluster
