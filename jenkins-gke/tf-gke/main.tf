@@ -96,17 +96,18 @@ module "jenkins-gke" {
   ]
 }
 
-#  resource "null_resource" "get-credential" {
-#   depends_on = [module.jenkins-gke] 
-#   provisioner "local-exec" {   
-#     command = "gcloud container clusters get-credentials ${module.jenkins-gke.name} --zone=${var.region}"
-#    }    
-#   triggers = {
-#     membership_id = module.jenkins-gke.cluster_id
-#     }
-#  }
+ resource "null_resource" "get-credential" {
+  depends_on = [module.jenkins-gke] 
+  provisioner "local-exec" {   
+    command = "gcloud container clusters get-credentials ${module.jenkins-gke.name} --zone=${var.region}"
+   }    
+  triggers = {
+    membership_id = module.jenkins-gke.name
+    }
+ }
 
 resource "kubernetes_namespace" "istio" {
+  depends_on = [module.jenkins-gke.name] 
   metadata {
      name = "istio-system"
   }
@@ -218,12 +219,6 @@ resource "local_file" "cred_file" {
   content  = "${base64decode(google_service_account_key.hubsa_credentials.private_key)}"
   filename = "${path.module}/hubsa-credentials.json"
 }
-
-resource "time_sleep" "wait_3m" {
-  depends_on = [module.jenkins-gke]
-  create_duration = "3m"
-}
-
 
 #Anthos - Make GKE Anthos Cluster
 module "asm-jenkins" {
