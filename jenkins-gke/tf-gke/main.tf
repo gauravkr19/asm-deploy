@@ -239,8 +239,7 @@ resource "time_sleep" "wait_1m" {
 resource "time_sleep" "wait_3m" {
   create_duration = "2m"
     triggers = {
-    # This sets up a proper dependency on the RAM association
-      cluster_name = module.asm-jenkins.cluster_name
+      membership_id = google_gke_hub_membership.membership.membership_id
     }
 }
 
