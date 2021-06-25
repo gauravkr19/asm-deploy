@@ -258,7 +258,7 @@ module "asm-jenkins" {
   #custom_overlays       = ["./custom_ingress_gateway.yaml"]
   skip_validation       = true
   outdir                = "./${module.jenkins-gke.name}-outdir-${var.asm_version}"
-  depends_on           = [time_sleep.wait_3m]
+  #depends_on           = [time_sleep.wait_3m]
 }
 
 # module "acm-jenkins" {
