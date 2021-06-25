@@ -236,7 +236,8 @@ resource "time_sleep" "wait_3m" {
  # //container.googleapis.com/projects/my-project/zones/us-west1-a/clusters/my-cluster
  
 module "asm-jenkins" {
-  source           = "terraform-google-modules/kubernetes-engine/google//modules/asm"
+  #source           = "terraform-google-modules/kubernetes-engine/google//modules/asm"
+  source           = "./modules/asm"
   version          = "15.0.0"
   asm_version      = var.asm_version
   project_id       = data.google_client_config.default.project
