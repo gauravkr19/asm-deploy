@@ -115,27 +115,12 @@ EOF
   }
 }
 
-
-#  resource "null_resource" "get-credential" {
-#   provisioner "local-exec" {   
-#     command = "gcloud container clusters get-credentials ${module.jenkins-gke.name} --zone=${var.region}"
-#    }    
-#   triggers = {
-#     membership_id = module.jenkins-gke.endpoint
-#     }
-#  }
-
 resource "kubernetes_namespace" "istio" {
   depends_on = [module.jenkins-gke.name] 
   metadata {
      name = "istio-system"
   }
 }
-# resource "kubernetes_namespace" "asm" {
-#   metadata {
-#      name = "asm-system"
-#   }
-# }
 
 /*****************************************
   Jenkins Workload Identity
