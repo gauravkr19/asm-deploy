@@ -101,9 +101,9 @@ module "jenkins-gke" {
   provisioner "local-exec" {   
     command = "gcloud container clusters get-credentials ${module.jenkins-gke.name} --zone=${var.region}"
    }    
-  triggers = {
-    membership_id = module.jenkins-gke.name
-    }
+  # triggers = {
+  #   membership_id = module.jenkins-gke.endpoint
+  #   }
  }
 
 resource "kubernetes_namespace" "istio" {
@@ -262,51 +262,50 @@ resource "google_gke_hub_membership" "membership" {
 }
 
 
-# module "acm-jenkins" {
-#   source           = "github.com/terraform-google-modules/terraform-google-kubernetes-engine//modules/acm"
+module "acm-jenkins" {
+  source           = "github.com/terraform-google-modules/terraform-google-kubernetes-engine//modules/acm"
 
-#   project_id       = data.google_client_config.default.project
-#   cluster_name     = var.clusname
-#   location         = module.jenkins-gke.location
-#   cluster_endpoint = module.jenkins-gke.endpoint
+  project_id       = data.google_client_config.default.project
+  cluster_name     = var.clusname
+  location         = module.jenkins-gke.location
+  cluster_endpoint = module.jenkins-gke.endpoint
 
-#   operator_path    = "config-management-operator.yaml"
-#   sync_repo        = var.acm_repo_location
-#   sync_branch      = var.acm_branch
-#   policy_dir       = var.acm_dir
-#   #depends_on	     = [module.asm-jenkins.asm_dir]
-# }
+  operator_path    = "config-management-operator.yaml"
+  sync_repo        = var.acm_repo_location
+  sync_branch      = var.acm_branch
+  policy_dir       = var.acm_dir
+  #depends_on	     = [module.asm-jenkins.asm_dir]
+}
 
 
-####--zone=${element(jsonencode(var.zones), 0)}" 
-#  resource "null_resource" "get-credentials" {
-#   depends_on = [
-#     module.asm-jenkins.asm_wait,
-#     module.acm-jenkins.wait,
-#   ] 
-#   provisioner "local-exec" {   
-#     command = "gcloud container clusters get-credentials ${module.jenkins-gke.name} --zone=${var.region}"
-#    }
-#  }
+ resource "null_resource" "get-credentials" {
+  depends_on = [
+    module.asm-jenkins.asm_wait,
+    module.acm-jenkins.wait,
+  ] 
+  provisioner "local-exec" {   
+    command = "gcloud container clusters get-credentials ${module.jenkins-gke.name} --zone=${var.region}"
+   }
+ }
 
-# data "local_file" "helm_chart_values" {
-#   filename    = "${path.module}/values.yaml"
-# }
-# resource "helm_release" "jenkins" {
-#   name       = "jenkins"
-#   repository = "https://charts.jenkins.io"
-#   chart      = "jenkins"
-#   #version   = "3.3.10"
-#   timeout    = 600
-#   values     = [data.local_file.helm_chart_values.content]
-#   depends_on = [
-#     kubernetes_secret.gh-secrets, 
-#     null_resource.get-credentials,
-#     data.local_file.helm_chart_values,
-#     module.asm-jenkins.asm_wait,
-#     module.acm-jenkins.wait,
-#   ]
-# }
+data "local_file" "helm_chart_values" {
+  filename    = "${path.module}/values.yaml"
+}
+resource "helm_release" "jenkins" {
+  name       = "jenkins"
+  repository = "https://charts.jenkins.io"
+  chart      = "jenkins"
+  #version   = "3.3.10"
+  timeout    = 600
+  values     = [data.local_file.helm_chart_values.content]
+  depends_on = [
+    kubernetes_secret.gh-secrets, 
+    null_resource.get-credentials,
+    data.local_file.helm_chart_values,
+    module.asm-jenkins.asm_wait,
+    module.acm-jenkins.wait,
+  ]
+}
 
 # resource "null_resource" "previous" {}
 # resource "time_sleep" "wait_2m" {
