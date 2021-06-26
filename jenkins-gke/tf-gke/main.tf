@@ -111,6 +111,7 @@ module "kubectl-ns" {
   cluster_location        = var.region
   kubectl_create_command  = "kubectl apply -f ${path.module}/asm-ns.yaml"
   kubectl_destroy_command = "kubectl delete ns asm-system"
+  module_depends_on       = [null_resource.get-credential]
 }
 
 resource "null_resource" "patch-ns" {
