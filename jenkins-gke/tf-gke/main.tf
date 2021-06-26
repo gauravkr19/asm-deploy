@@ -96,15 +96,14 @@ module "jenkins-gke" {
   ]
 }
 
- resource "null_resource" "get-credential" {
-  depends_on = [module.jenkins-gke] 
-  provisioner "local-exec" {   
-    command = "gcloud container clusters get-credentials ${module.jenkins-gke.name} --zone=${var.region}"
-   }    
-  triggers = {
-    membership_id = module.jenkins-gke.endpoint
-    }
- }
+#  resource "null_resource" "get-credential" {
+#   provisioner "local-exec" {   
+#     command = "gcloud container clusters get-credentials ${module.jenkins-gke.name} --zone=${var.region}"
+#    }    
+#   triggers = {
+#     membership_id = module.jenkins-gke.endpoint
+#     }
+#  }
 
 resource "kubernetes_namespace" "istio" {
   depends_on = [module.jenkins-gke.name] 
