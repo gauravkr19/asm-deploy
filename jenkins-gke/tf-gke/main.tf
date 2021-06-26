@@ -227,9 +227,13 @@ resource "google_service_account_key" "hubsa_credentials" {
   public_key_type    = "TYPE_X509_PEM_FILE"
 }
 
-resource "local_file" "cred_file" {
+resource "local_file" "cred_asm" {
   content  = "${base64decode(google_service_account_key.hubsa_credentials.private_key)}"
   filename = "${path.module}/hubsa-credentials.json"
+}
+resource "local_file" "cred_acm" {
+  content  = "${base64decode(google_service_account_key.hubsa_credentials.private_key)}"
+  filename = "${path.module}/tf-gke/hubsa-credentials.json"
 }
 
 #Anthos - Make GKE Anthos Cluster
@@ -250,7 +254,7 @@ module "asm-jenkins" {
   enable_registration   = false
   managed_control_plane = false
   service_account       = google_service_account.hubsa.email
-  key_file              = "${path.module}/hubsa-credentials.json"
+  key_file              = "${path.module}/tf-gke/hubsa-credentials.json"
   options               = ["envoy-access-log,egressgateways"]
   skip_validation       = true
   outdir                = "./${module.jenkins-gke.name}-outdir-${var.asm_version}"
