@@ -110,17 +110,17 @@ module "kubectl-ns" {
   cluster_name            = var.clusname
   cluster_location        = var.region
   kubectl_create_command  = "kubectl apply -f ${path.module}/asm-ns.yaml"
-  kubectl_destroy_command = "kubectl delete ns test-system"
+  kubectl_destroy_command = "kubectl delete ns asm-system"
 }
 
-resource "null_resource" "patch-ns" {
-  depends_on = [module.kubectl-ns]
-  provisioner "local-exec" {
-    command = <<EOF
-kubectl patch ns test-system --type='json' -p='[{"op": "add", "path": "/metadata/annotations/gke.io~1cluster", "value": "gke://${var.project_id}/${var.region}/${module.jenkins-gke.name}"}]'
-EOF
-  }
-}
+# resource "null_resource" "patch-ns" {
+#   depends_on = [module.kubectl-ns]
+#   provisioner "local-exec" {
+#     command = <<EOF
+# kubectl patch ns asm-system --type='json' -p='[{"op": "add", "path": "/metadata/annotations/gke.io~1cluster", "value": "gke://${var.project_id}/${var.region}/${module.jenkins-gke.name}"}]'
+# EOF
+#   }
+# }
 
 resource "kubernetes_namespace" "istio" {
   depends_on = [module.jenkins-gke.name] 
@@ -276,7 +276,7 @@ module "acm-jenkins" {
   cluster_name     = var.clusname
   location         = module.jenkins-gke.location
   cluster_endpoint = module.jenkins-gke.endpoint
-  service_account_key_file = "${path.module}/hubsa-credentials.json"
+  #service_account_key_file = "${path.module}/hubsa-credentials.json"
 
   operator_path    = "config-management-operator.yaml"
   sync_repo        = var.acm_repo_location
