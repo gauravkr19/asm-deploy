@@ -273,17 +273,17 @@ module "acm-jenkins" {
   policy_dir       = var.acm_dir
 }
 
-resource "null_resource" "get-credentials" {
- depends_on = [
-   module.asm-jenkins.asm_wait,
-   module.acm-jenkins.wait,
- ] 
- provisioner "local-exec" {   
-   command = "gcloud container clusters get-credentials ${module.jenkins-gke.name} --zone=${var.region}"
-  }
-}
-
 #### Jenkins Deployment ####
+# resource "null_resource" "get-credentials" {
+#  depends_on = [
+#    module.asm-jenkins.asm_wait,
+#    module.acm-jenkins.wait,
+#  ] 
+#  provisioner "local-exec" {   
+#    command = "gcloud container clusters get-credentials ${module.jenkins-gke.name} --zone=${var.region}"
+#   }
+# }
+
 # data "local_file" "helm_chart_values" {
 #   filename    = "${path.module}/values.yaml"
 # }
