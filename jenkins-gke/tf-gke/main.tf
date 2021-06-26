@@ -118,6 +118,7 @@ EOF
       CLUSTER = var.clusname
     }
   }
+}
 
 
 #  resource "null_resource" "get-credential" {
