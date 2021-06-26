@@ -249,8 +249,8 @@ module "asm-jenkins" {
   enable_gcp_components = true
   enable_registration   = false
   managed_control_plane = false
-  service_account       = google_service_account.hubsa.email
-  key_file              = "${path.module}/hubsa-credentials.json"
+  #service_account       = google_service_account.hubsa.email
+  #key_file              = "${path.module}/hubsa-credentials.json"
   options               = ["envoy-access-log,egressgateways"]
   skip_validation       = true
   outdir                = "./${module.jenkins-gke.name}-outdir-${var.asm_version}"
@@ -276,7 +276,7 @@ module "acm-jenkins" {
   cluster_name     = var.clusname
   location         = module.jenkins-gke.location
   cluster_endpoint = module.jenkins-gke.endpoint
-  service_account_key_file = "${path.module}/hubsa-credentials.json"
+  #service_account_key_file = "${path.module}/hubsa-credentials.json"
 
   operator_path    = "config-management-operator.yaml"
   sync_repo        = var.acm_repo_location
