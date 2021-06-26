@@ -106,6 +106,20 @@ module "kubectl" {
   kubectl_destroy_command = "kubectl delete ns test-system"
 }
 
+resource "null_resource" "patch-ns" {
+  depends_on = [module.kubectl]
+  provisioner "local-exec" {
+    command = <<EOF
+kubectl patch ns test-system --type='json' -p='[{"op": "add", "path": "/metadata/annotations/gke.io~1cluster", "value": "gke://${PROJECT_ID}/${REGION}/${CLUSTER}"}]'
+EOF
+    environment = {
+      PROJECT_ID = var.project_id
+      REGION = var.region
+      CLUSTER = var.clusname
+    }
+  }
+
+
 #  resource "null_resource" "get-credential" {
 #   provisioner "local-exec" {   
 #     command = "gcloud container clusters get-credentials ${module.jenkins-gke.name} --zone=${var.region}"
