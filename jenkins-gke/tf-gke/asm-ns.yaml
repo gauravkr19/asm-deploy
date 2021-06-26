@@ -6,4 +6,4 @@ metadata:
   name: test-system
 spec:
   finalizers:
-  - kubernetes-1
+  - kubernetes
