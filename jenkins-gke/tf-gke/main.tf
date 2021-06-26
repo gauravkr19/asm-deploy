@@ -102,19 +102,7 @@ module "kubectl" {
   project_id              = var.project_id
   cluster_name            = var.clusname
   cluster_location        = var.region
-  kubectl_create_command  = "cat <<EOF | kubectl apply -f -
-apiVersion: v1
-kind: Namespace
-metadata:
-  annotations:
-    gke.io/cluster: gke://${var.project_id}/${var.region}/${module.jenkins-gke.name}
-  labels:
-    control-plane: controller-manager-1
-  name: test-system
-spec:
-  finalizers:
-  - kubernetes-1
-EOF"
+  kubectl_create_command  = "kubectl apply -f ${path.module}/asm-ns.yaml"
   kubectl_destroy_command = "kubectl delete ns test-system"
 }
 
