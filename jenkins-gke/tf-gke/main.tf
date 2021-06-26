@@ -276,7 +276,7 @@ module "acm-jenkins" {
   cluster_name     = var.clusname
   location         = module.jenkins-gke.location
   cluster_endpoint = module.jenkins-gke.endpoint
-  service_account_key_file = "${path.module}/hubsa-credentials.json"
+  service_account_key_file = "${file("sakey.json")}"
 
   operator_path    = "config-management-operator.yaml"
   sync_repo        = var.acm_repo_location
