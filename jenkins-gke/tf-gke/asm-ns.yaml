@@ -2,8 +2,8 @@ apiVersion: v1
 kind: Namespace
 metadata:
   labels:
-    control-plane: controller-manager-1
-  name: test-system
+    control-plane: controller-manager
+  name: asm-system
 spec:
   finalizers:
   - kubernetes

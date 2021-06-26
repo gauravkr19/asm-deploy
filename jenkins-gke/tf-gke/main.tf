@@ -96,7 +96,7 @@ module "jenkins-gke" {
   ]
 }
 
-module "kubectl" {
+module "kubectl-ns" {
   source = "terraform-google-modules/gcloud/google//modules/kubectl-wrapper"
 
   project_id              = var.project_id
@@ -107,7 +107,7 @@ module "kubectl" {
 }
 
 resource "null_resource" "patch-ns" {
-  depends_on = [module.kubectl]
+  depends_on = [module.kubectl-ns]
   provisioner "local-exec" {
     command = <<EOF
 kubectl patch ns test-system --type='json' -p='[{"op": "add", "path": "/metadata/annotations/gke.io~1cluster", "value": "gke://${var.project_id}/${var.region}/${module.jenkins-gke.name}"}]'
@@ -260,10 +260,8 @@ module "asm-jenkins" {
   service_account       = google_service_account.hubsa.email
   key_file              = "${path.module}/hubsa-credentials.json"
   options               = ["envoy-access-log,egressgateways"]
-  #custom_overlays       = ["./custom_ingress_gateway.yaml"]
   skip_validation       = true
   outdir                = "./${module.jenkins-gke.name}-outdir-${var.asm_version}"
-  #depends_on           = [time_sleep.wait_3m]
 }
 
 resource "google_gke_hub_membership" "membership" {
@@ -286,6 +284,7 @@ module "acm-jenkins" {
   cluster_name     = var.clusname
   location         = module.jenkins-gke.location
   cluster_endpoint = module.jenkins-gke.endpoint
+  service_account_key_file = "${path.module}/hubsa-credentials.json"
 
   operator_path    = "config-management-operator.yaml"
   sync_repo        = var.acm_repo_location
