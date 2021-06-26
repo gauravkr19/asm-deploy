@@ -114,14 +114,14 @@ module "kubectl-ns" {
   module_depends_on       = [null_resource.get-credential]
 }
 
-resource "null_resource" "patch-ns" {
-  depends_on = [module.kubectl-ns]
-  provisioner "local-exec" {
-    command = <<EOF
-kubectl patch ns asm-system --type='json' -p='[{"op": "add", "path": "/metadata/annotations/gke.io~1cluster", "value": "gke://${var.project_id}/${var.region}/${module.jenkins-gke.name}"}]'
-EOF
-  }
-}
+# resource "null_resource" "patch-ns" {
+#   depends_on = [module.kubectl-ns]
+#   provisioner "local-exec" {
+#     command = <<EOF
+# kubectl patch ns asm-system --type='json' -p='[{"op": "add", "path": "/metadata/annotations/gke.io~1cluster", "value": "gke://${var.project_id}/${var.region}/${module.jenkins-gke.name}"}]'
+# EOF
+#   }
+# }
 
 resource "kubernetes_namespace" "istio" {
   depends_on = [module.jenkins-gke.name] 
