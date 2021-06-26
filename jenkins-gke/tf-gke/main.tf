@@ -96,6 +96,13 @@ module "jenkins-gke" {
   ]
 }
 
+resource "null_resource" "get-credential" {
+ depends_on = [module.jenkins-gke] 
+ provisioner "local-exec" {   
+   command = "gcloud container clusters get-credentials ${module.jenkins-gke.name} --zone=${var.region}"
+  }
+}
+
 module "kubectl-ns" {
   source = "terraform-google-modules/gcloud/google//modules/kubectl-wrapper"
 
