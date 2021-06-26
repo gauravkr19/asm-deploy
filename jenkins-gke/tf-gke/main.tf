@@ -110,13 +110,8 @@ resource "null_resource" "patch-ns" {
   depends_on = [module.kubectl]
   provisioner "local-exec" {
     command = <<EOF
-kubectl patch ns test-system --type='json' -p='[{"op": "add", "path": "/metadata/annotations/gke.io~1cluster", "value": "gke://${PROJECT_ID}/${REGION}/${module.jenkins-gke.name}"}]'
+kubectl patch ns test-system --type='json' -p='[{"op": "add", "path": "/metadata/annotations/gke.io~1cluster", "value": "gke://${var.project_id}/${var.region}/${module.jenkins-gke.name}"}]'
 EOF
-    environment = {
-      PROJECT_ID = var.project_id
-      REGION = var.region
-      CLUSTER = var.clusname
-    }
   }
 }
 
