@@ -112,11 +112,11 @@ resource "kubernetes_namespace" "istio" {
      name = "istio-system"
   }
 }
-resource "kubernetes_namespace" "asm" {
-  metadata {
-     name = "asm-system"
-  }
-}
+# resource "kubernetes_namespace" "asm" {
+#   metadata {
+#      name = "asm-system"
+#   }
+# }
 
 /*****************************************
   Jenkins Workload Identity
