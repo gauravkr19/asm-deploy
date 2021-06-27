@@ -286,6 +286,7 @@ module "acm-jenkins" {
   sync_repo        = var.acm_repo_location
   sync_branch      = var.acm_branch
   policy_dir       = var.acm_dir
+  depends_on       = [module.asm-jenkins.asm_wait]
 }
 
 #### Jenkins Deployment ####
