@@ -237,62 +237,62 @@ resource "local_file" "cred_acm" {
 }
 
 #Anthos - Make GKE Anthos Cluster
-# module "asm-jenkins" {
-#   source           = "terraform-google-modules/kubernetes-engine/google//modules/asm"
-#   version          = "15.0.0"
-#   asm_version      = var.asm_version
-#   project_id       = data.google_client_config.default.project
-#   cluster_name     = var.clusname
-#   location         = module.jenkins-gke.location
-#   cluster_endpoint = module.jenkins-gke.endpoint
-#   enable_all            = false
-#   enable_cluster_roles  = true
-#   enable_cluster_labels = false
-#   enable_gcp_apis       = false
-#   enable_gcp_iam_roles  = false
-#   enable_gcp_components = true
-#   enable_registration   = false
-#   managed_control_plane = false
-#   service_account       = google_service_account.hubsa.email
-#   key_file              = "${path.module}/tf-gke/hubsa-credentials.json"
-#   options               = ["envoy-access-log,egressgateways"]
-#   skip_validation       = true
-#   outdir                = "./${module.jenkins-gke.name}-outdir-${var.asm_version}"
-# }
+module "asm-jenkins" {
+  source           = "terraform-google-modules/kubernetes-engine/google//modules/asm"
+  version          = "15.0.0"
+  asm_version      = var.asm_version
+  project_id       = data.google_client_config.default.project
+  cluster_name     = var.clusname
+  location         = module.jenkins-gke.location
+  cluster_endpoint = module.jenkins-gke.endpoint
+  enable_all            = false
+  enable_cluster_roles  = true
+  enable_cluster_labels = false
+  enable_gcp_apis       = false
+  enable_gcp_iam_roles  = false
+  enable_gcp_components = true
+  enable_registration   = false
+  managed_control_plane = false
+  service_account       = google_service_account.hubsa.email
+  key_file              = "${path.module}/tf-gke/hubsa-credentials.json"
+  options               = ["envoy-access-log,egressgateways"]
+  skip_validation       = true
+  outdir                = "./${module.jenkins-gke.name}-outdir-${var.asm_version}"
+}
 
-# resource "google_gke_hub_membership" "membership" {
-#   depends_on    = [module.asm-jenkins]
-#   membership_id = "anthos-gke"
-#   project       = var.project_id
-#   endpoint {
-#     gke_cluster {
-#       resource_link = "//container.googleapis.com/projects/${var.project_id}/locations/${var.region}/clusters/${var.clusname}"
-#     }
-#   }
-#   description = "Anthos Cluster Hub Registration"
-#   provider = google-beta
-# }
+resource "google_gke_hub_membership" "membership" {
+  depends_on    = [module.acm-jenkins]
+  membership_id = "anthos-gke"
+  project       = var.project_id
+  endpoint {
+    gke_cluster {
+      resource_link = "//container.googleapis.com/projects/${var.project_id}/locations/${var.region}/clusters/${var.clusname}"
+    }
+  }
+  description = "Anthos Cluster Hub Registration"
+  provider = google-beta
+}
 
-# resource "time_sleep" "wait_2m" {
-#   depends_on = [module.acm-jenkins]
-#   create_duration = "2m"
-# }
+resource "time_sleep" "wait_2m" {
+  depends_on = [module.acm-jenkins]
+  create_duration = "2m"
+}
 
-# module "acm-jenkins" {
-#   source           = "github.com/terraform-google-modules/terraform-google-kubernetes-engine//modules/acm"
+module "acm-jenkins" {
+  source           = "github.com/terraform-google-modules/terraform-google-kubernetes-engine//modules/acm"
 
-#   project_id       = data.google_client_config.default.project
-#   cluster_name     = var.clusname
-#   location         = module.jenkins-gke.location
-#   cluster_endpoint = module.jenkins-gke.endpoint
-#   service_account_key_file = "${path.module}/hubsa-credentials.json"
+  project_id       = data.google_client_config.default.project
+  cluster_name     = var.clusname
+  location         = module.jenkins-gke.location
+  cluster_endpoint = module.jenkins-gke.endpoint
+  service_account_key_file = "${path.module}/hubsa-credentials.json"
 
-#   operator_path    = "config-management-operator.yaml"
-#   sync_repo        = var.acm_repo_location
-#   sync_branch      = var.acm_branch
-#   policy_dir       = var.acm_dir
-#   depends_on       = [google_service_account.hubsa]
-# }
+  operator_path    = "config-management-operator.yaml"
+  sync_repo        = var.acm_repo_location
+  sync_branch      = var.acm_branch
+  policy_dir       = var.acm_dir
+  #depends_on       = [google_service_account.hubsa]
+}
 
 #### Jenkins Deployment ####
 # resource "null_resource" "get-credentials" {
