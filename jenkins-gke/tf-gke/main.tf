@@ -231,10 +231,6 @@ resource "local_file" "cred_asm" {
   content  = "${base64decode(google_service_account_key.hubsa_credentials.private_key)}"
   filename = "${path.module}/hubsa-credentials.json"
 }
-resource "local_file" "cred_acm" {
-  content  = "${base64decode(google_service_account_key.hubsa_credentials.private_key)}"
-  filename = "${file("sakey.json")}"
-}
 
 #Anthos - Make GKE Anthos Cluster
 module "asm-jenkins" {
@@ -280,13 +276,12 @@ module "acm-jenkins" {
   cluster_name     = var.clusname
   location         = module.jenkins-gke.location
   cluster_endpoint = module.jenkins-gke.endpoint
-  service_account_key_file = "${path.module}/hubsa-credentials.json"
+  service_account_key_file = "${file("sakey.json")}"
 
   operator_path    = "config-management-operator.yaml"
   sync_repo        = var.acm_repo_location
   sync_branch      = var.acm_branch
   policy_dir       = var.acm_dir
-  #depends_on       = [google_service_account.hubsa]
 }
 
 #### Jenkins Deployment ####
