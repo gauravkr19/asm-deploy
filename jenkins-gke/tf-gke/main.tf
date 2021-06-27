@@ -273,21 +273,21 @@ resource "google_gke_hub_membership" "membership" {
   provider = google-beta
 }
 
-module "acm-jenkins" {
-  source           = "github.com/terraform-google-modules/terraform-google-kubernetes-engine//modules/acm"
+# module "acm-jenkins" {
+#   source           = "github.com/terraform-google-modules/terraform-google-kubernetes-engine//modules/acm"
 
-  project_id       = data.google_client_config.default.project
-  cluster_name     = var.clusname
-  location         = module.jenkins-gke.location
-  cluster_endpoint = module.jenkins-gke.endpoint
-  service_account_key_file = "${path.module}/hubsa-credentials.json"
+#   project_id       = data.google_client_config.default.project
+#   cluster_name     = var.clusname
+#   location         = module.jenkins-gke.location
+#   cluster_endpoint = module.jenkins-gke.endpoint
+#   service_account_key_file = "${path.module}/hubsa-credentials.json"
 
-  operator_path    = "config-management-operator.yaml"
-  sync_repo        = var.acm_repo_location
-  sync_branch      = var.acm_branch
-  policy_dir       = var.acm_dir
-  depends_on       = [google_service_account.hubsa]
-}
+#   operator_path    = "config-management-operator.yaml"
+#   sync_repo        = var.acm_repo_location
+#   sync_branch      = var.acm_branch
+#   policy_dir       = var.acm_dir
+#   depends_on       = [google_service_account.hubsa]
+# }
 
 #### Jenkins Deployment ####
 # resource "null_resource" "get-credentials" {
