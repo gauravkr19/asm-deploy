@@ -110,8 +110,4 @@ variable "asm_version" {
   description = "description"
 }
 
-variable "gcpcred" {
-  default     = ""
-  description = "cred for Jenkins and ACM SA Key"
-}
 
