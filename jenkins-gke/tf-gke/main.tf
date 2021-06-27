@@ -273,11 +273,6 @@ resource "google_gke_hub_membership" "membership" {
   provider = google-beta
 }
 
-resource "time_sleep" "wait_2m" {
-  depends_on = [module.acm-jenkins]
-  create_duration = "2m"
-}
-
 module "acm-jenkins" {
   source           = "github.com/terraform-google-modules/terraform-google-kubernetes-engine//modules/acm"
 
