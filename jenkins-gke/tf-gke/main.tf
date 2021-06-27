@@ -260,18 +260,18 @@ resource "local_file" "cred_acm" {
 #   outdir                = "./${module.jenkins-gke.name}-outdir-${var.asm_version}"
 # }
 
-resource "google_gke_hub_membership" "membership" {
-  depends_on    = [module.asm-jenkins]
-  membership_id = "anthos-gke"
-  project       = var.project_id
-  endpoint {
-    gke_cluster {
-      resource_link = "//container.googleapis.com/projects/${var.project_id}/locations/${var.region}/clusters/${var.clusname}"
-    }
-  }
-  description = "Anthos Cluster Hub Registration"
-  provider = google-beta
-}
+# resource "google_gke_hub_membership" "membership" {
+#   depends_on    = [module.asm-jenkins]
+#   membership_id = "anthos-gke"
+#   project       = var.project_id
+#   endpoint {
+#     gke_cluster {
+#       resource_link = "//container.googleapis.com/projects/${var.project_id}/locations/${var.region}/clusters/${var.clusname}"
+#     }
+#   }
+#   description = "Anthos Cluster Hub Registration"
+#   provider = google-beta
+# }
 
 # resource "time_sleep" "wait_2m" {
 #   depends_on = [module.acm-jenkins]
