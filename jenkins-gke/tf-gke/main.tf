@@ -214,7 +214,7 @@ resource "google_storage_bucket_iam_member" "tf-state-writer" {
  *****************************************/
 resource "google_service_account" "asm" {
   depends_on = [module.acm-jenkins.wait]
-  account_id   = "hub-svc-sa"
+  account_id   = "asm-svc-sa"
   display_name = "My Service Account"
 }
 resource "google_project_iam_member" "asmbind" {
@@ -302,6 +302,11 @@ resource "google_gke_hub_membership" "membership" {
   }
   description = "Anthos Cluster Hub Registration"
   provider = google-beta
+}
+
+resource "time_sleep" "wait_2m" {
+  depends_on = [module.asm-jenkins.module.asm_install.module.gcloud_kubectl]
+  create_duration = "2m"
 }
 
 module "acm-jenkins" {
