@@ -229,7 +229,7 @@ resource "local_file" "cred_asm" {
   filename = "${path.module}/hubsa-credentials.json"
 }
 ##### SA Key for ACM #######
-/*
+
 resource "google_service_account" "acm" {
   depends_on = [
     module.asm-jenkins.asm_wait
@@ -310,7 +310,7 @@ module "acm-jenkins" {
   sync_branch      = var.acm_branch
   policy_dir       = var.acm_dir
 }
-*/
+
 
 #### Jenkins Deployment ####
 # resource "null_resource" "get-credentials" {
