@@ -283,7 +283,7 @@ module "asm-jenkins" {
 }
 
 resource "time_sleep" "wait_30s" {
-   depends_on = [module.asm-jenkins.wait]
+   depends_on = [module.asm-jenkins.asm_wait]
   create_duration = "30s"
 }
 
