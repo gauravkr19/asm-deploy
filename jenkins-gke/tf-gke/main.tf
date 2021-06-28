@@ -228,8 +228,13 @@ resource "local_file" "cred_asm" {
   content  = "${base64decode(google_service_account_key.hubsa_credentials.private_key)}"
   filename = "${path.module}/hubsa-credentials.json"
 }
+resource "null_resource" "get-credentials" {
+ depends_on = [local_file.cred_asm] 
+ provisioner "local-exec" {   
+   command = "gcloud container clusters get-credentials ${module.jenkins-gke.name} --zone=${var.region}"
+  }
+}
 ##### SA Key for ACM #######
-
 resource "google_service_account" "acm" {
   depends_on = [
     module.asm-jenkins.asm_wait
