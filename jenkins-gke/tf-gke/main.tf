@@ -215,22 +215,41 @@ resource "google_service_account" "hubsa" {
   account_id   = "hub-svc-sa"
   display_name = "My Service Account"
 }
-
 resource "google_project_iam_member" "hubaccess" {
   project = data.google_client_config.default.project
   role    = "roles/owner"
   member  = "serviceAccount:${google_service_account.hubsa.email}"
 }
-
 resource "google_service_account_key" "hubsa_credentials" {
   service_account_id = google_service_account.hubsa.name
   public_key_type    = "TYPE_X509_PEM_FILE"
 }
-
 resource "local_file" "cred_asm" {
   content  = "${base64decode(google_service_account_key.hubsa_credentials.private_key)}"
   filename = "${path.module}/hubsa-credentials.json"
 }
+##### SA Key for ACM #######
+resource "google_service_account" "acm" {
+  depends_on = [
+    module.asm-jenkins.asm_wait
+  ]
+  account_id   = "anthos-svc-acm-sa"
+  display_name = "SA for ACM"
+}
+resource "google_project_iam_member" "acmbind" {
+  project = data.google_client_config.default.project
+  role    = "roles/owner"
+  member  = "serviceAccount:${google_service_account.acm.email}"
+}
+resource "google_service_account_key" "acm_credentials" {
+  service_account_id = google_service_account.acm.name
+  public_key_type    = "TYPE_X509_PEM_FILE"
+}
+resource "local_file" "cred_asm" {
+  content  = "${base64decode(google_service_account_key.acm_credentials.private_key)}"
+  filename = "${path.module}/acm-credentials.json"
+}
+
 
 #Anthos - Make GKE Anthos Cluster
 # module "asm-jenkins" {
