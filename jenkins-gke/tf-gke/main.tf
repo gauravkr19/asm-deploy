@@ -257,7 +257,7 @@ module "asm-jenkins" {
 }
 
 resource "time_sleep" "wait_1m" {
-  depends_on = [null_resource.previous]
+  depends_on = [local_file.cred_asm]
   create_duration = "1m"
 }
 
