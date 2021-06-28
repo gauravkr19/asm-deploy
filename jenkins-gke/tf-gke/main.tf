@@ -229,6 +229,7 @@ resource "local_file" "cred_asm" {
   filename = "${path.module}/hubsa-credentials.json"
 }
 ##### SA Key for ACM #######
+/*
 resource "google_service_account" "acm" {
   depends_on = [
     module.asm-jenkins.asm_wait
@@ -302,13 +303,14 @@ module "acm-jenkins" {
   cluster_name     = var.clusname
   location         = module.jenkins-gke.location
   cluster_endpoint = module.jenkins-gke.endpoint
-  service_account_key_file = "${path.module}/hubsa-credentials.json"
+  service_account_key_file = "${path.module}/acm-credentials.json"
 
   operator_path    = "config-management-operator.yaml"
   sync_repo        = var.acm_repo_location
   sync_branch      = var.acm_branch
   policy_dir       = var.acm_dir
 }
+*/
 
 #### Jenkins Deployment ####
 # resource "null_resource" "get-credentials" {
