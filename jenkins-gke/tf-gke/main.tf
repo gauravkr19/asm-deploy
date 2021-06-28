@@ -305,7 +305,7 @@ resource "google_gke_hub_membership" "membership" {
 }
 
 resource "time_sleep" "wait_2m" {
-  depends_on = [module.asm-jenkins.module.asm_install.module.gcloud_kubectl]
+  depends_on = [google_gke_hub_membership.membership]
   create_duration = "2m"
 }
 
