@@ -212,6 +212,7 @@ resource "google_storage_bucket_iam_member" "tf-state-writer" {
   SA for ASM
  *****************************************/
 resource "google_service_account" "asm" {
+  depends_on = [module.acm-jenkins.wait]
   account_id   = "hub-svc-sa"
   display_name = "My Service Account"
 }
@@ -236,7 +237,6 @@ resource "null_resource" "get-credentials" {
 }
 ##### SA Key for ACM #######
 resource "google_service_account" "acm" {
-  depends_on = [module.asm-jenkins.asm_wait]
   account_id   = "anthos-svc-acm-sa"
   display_name = "SA for ACM"
 }
@@ -253,9 +253,9 @@ resource "local_file" "cred_acm" {
   content  = "${base64decode(google_service_account_key.acm_credentials.private_key)}"
   filename = "${path.module}/acm-credentials.json"
 }
-resource "time_sleep" "wait_31s" {
+resource "time_sleep" "wait_10s" {
   depends_on = [local_file.cred_acm]
-  create_duration = "31s"
+  create_duration = "10s"
 }
 
 #Anthos - Make GKE Anthos Cluster
@@ -282,15 +282,15 @@ module "asm-jenkins" {
   outdir                = "./${module.jenkins-gke.name}-outdir-${var.asm_version}"
 }
 
-resource "time_sleep" "wait_30s" {
-   depends_on = [module.asm-jenkins.asm_wait]
-  create_duration = "30s"
+resource "time_sleep" "wait_20s" {
+   depends_on = [module.acm-jenkins.wait]
+  create_duration = "20s"
 }
 
 resource "google_gke_hub_membership" "membership" {
   depends_on    = [
-    module.asm-jenkins.asm_wait,
-    time_sleep.wait_30s
+    module.acm-jenkins.wait,
+    time_sleep.wait_20s
     ]
   membership_id = "anthos-gke"
   project       = var.project_id
