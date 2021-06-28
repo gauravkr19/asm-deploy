@@ -256,9 +256,9 @@ module "asm-jenkins" {
   outdir                = "./${module.jenkins-gke.name}-outdir-${var.asm_version}"
 }
 
-resource "time_sleep" "wait_1m" {
+resource "time_sleep" "wait_3m" {
   depends_on = [module.acm-jenkins]
-  create_duration = "1m"
+  create_duration = "3m"
 }
 
 resource "google_gke_hub_membership" "membership" {
