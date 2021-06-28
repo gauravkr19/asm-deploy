@@ -229,7 +229,7 @@ resource "local_file" "cred_asm" {
   filename = "${path.module}/hubsa-credentials.json"
 }
 ##### SA Key for ACM #######
-/*
+
 resource "google_service_account" "acm" {
   depends_on = [
     module.asm-jenkins.asm_wait
@@ -275,15 +275,15 @@ module "asm-jenkins" {
   outdir                = "./${module.jenkins-gke.name}-outdir-${var.asm_version}"
 }
 
-resource "time_sleep" "wait_1m" {
+resource "time_sleep" "wait_30s" {
    depends_on = [module.acm-jenkins.wait]
-  create_duration = "1m"
+  create_duration = "30s"
 }
 
 resource "google_gke_hub_membership" "membership" {
   depends_on    = [
     module.acm-jenkins.wait,
-    time_sleep.wait_1m
+    time_sleep.wait_30s
     ]
   membership_id = "anthos-gke"
   project       = var.project_id
@@ -310,7 +310,7 @@ module "acm-jenkins" {
   sync_branch      = var.acm_branch
   policy_dir       = var.acm_dir
 }
-*/
+
 
 #### Jenkins Deployment ####
 # resource "null_resource" "get-credentials" {
