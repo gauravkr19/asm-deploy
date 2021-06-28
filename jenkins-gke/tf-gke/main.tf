@@ -256,8 +256,16 @@ module "asm-jenkins" {
   outdir                = "./${module.jenkins-gke.name}-outdir-${var.asm_version}"
 }
 
+resource "time_sleep" "wait_1m" {
+  depends_on = [null_resource.previous]
+  create_duration = "1m"
+}
+
 resource "google_gke_hub_membership" "membership" {
-  depends_on    = [module.acm-jenkins]
+  depends_on    = [
+    module.acm-jenkins,
+    time_sleep.wait_1m
+    ]
   membership_id = "anthos-gke"
   project       = var.project_id
   endpoint {
