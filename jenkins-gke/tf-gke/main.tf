@@ -256,14 +256,18 @@ module "asm-jenkins" {
   outdir                = "./${module.jenkins-gke.name}-outdir-${var.asm_version}"
 }
 
+resource "time_sleep" "wait_1m" {
+   depends_on = module.acm-jenkins.wait
+  create_duration = "1m"
+}
 resource "time_sleep" "wait_3m" {
-  depends_on = [module.acm-jenkins]
+    depends_on = [google_gke_hub_membership.membership]
   create_duration = "3m"
 }
 
 resource "google_gke_hub_membership" "membership" {
   depends_on    = [
-    module.acm-jenkins,
+    module.acm-jenkins.wait,
     time_sleep.wait_1m
     ]
   membership_id = "anthos-gke"
