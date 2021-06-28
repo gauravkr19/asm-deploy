@@ -246,7 +246,12 @@ resource "google_service_account_key" "acm_credentials" {
   service_account_id = google_service_account.acm.name
   public_key_type    = "TYPE_X509_PEM_FILE"
 }
+resource "time_sleep" "wait_31s" {
+  depends_on = [google_service_account_key.acm_credentials]
+  create_duration = "31s"
+}
 resource "local_file" "cred_acm" {
+  depends_on = [time_sleep.wait_31s]
   content  = "${base64decode(google_service_account_key.acm_credentials.private_key)}"
   filename = "${path.module}/acm-credentials.json"
 }
